@@ -253,12 +253,95 @@ h1 {
     font-weight: bold;
 }
 
+/* RESPONSIVIDADE MOBILE */
 @media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        border-radius: 14px;
+        max-width: 100%;
+    }
+
+    .header {
+        padding: 15px 10px;
+    }
+
+    .warning-banner {
+        font-size: 0.65rem;
+        padding: 8px;
+        letter-spacing: 1px;
+    }
+
+    .main-logo {
+        max-width: 180px;
+    }
+
+    h1 {
+        font-size: 1.1rem;
+        line-height: 1.3;
+    }
+
+    .subtitle {
+        font-size: 0.75rem;
+    }
+
+    .calculator-grid {
+        grid-template-columns: 1fr; /* 1 coluna no celular */
+        padding: 15px;
+        gap: 12px;
+    }
+
+    .product-select,
+    .checkbox-group,
+    .result-rec,
+    .result-total {
+        grid-column: 1 / -1;
+    }
+
+    .input-group input,
+    .input-group select {
+        font-size: 16px; /* evita zoom automático no iPhone */
+        padding: 12px 10px;
+    }
+
+    .input-group label {
+        font-size: 0.65rem;
+    }
+
+    .checkbox-group {
+        padding: 12px;
+    }
+
+    .checkbox-container {
+        font-size: 0.9rem;
+        text-align: center;
+        flex-wrap: wrap;
+    }
+
+    .result-rec input {
+        font-size: 1.3rem;
+        padding: 16px 10px;
+    }
+
+    .converter-section {
+        padding: 15px;
+    }
+
     .converter-grid {
         flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
     }
+
     .converter-arrow {
         transform: rotate(90deg);
         padding: 0;
+        text-align: center;
+    }
+
+    .converter-grid .input-group {
+        width: 100%;
     }
 }
