@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Consulta Material Gráfico</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="topo">
+        <h1>Consulta de Preços - Catálogo 2026</h1>
+    </div>
+    
+    <div class="filtros">
+        <div>
+            <label>Categoria:</label>
+            <select id="selectCat" style="width:100%"></select>
+        </div>
+        <div>
+            <label>Buscar por Código:</label>
+            <input type="text" id="buscaCod" placeholder="Ex: GIFT1511" style="width:100%">
+        </div>
+    </div>
+
+    <table id="tabela">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Descrição (Categoria - Serviço)</th>
+                <th>Cores</th>
+                <th>Qtd</th>
+                <th>Tamanho</th>
+                <th>Preço Final (R$)</th>
+            </tr>
+        </thead>
+        <tbody id="corpoTabela"></tbody>
+    </table>
+</div>
+
+<script src="meus_dados.js"></script>
+
+<script>
+    const listaCategorias = ["ABRIDORES E CHAVEIROS", "ACESSÓRIOS PARA COMPUTADORES", "ADESIVOS", "AGENDAS, CADERNOS E APOSTILAS", "ALMOFADA PERSONALIZADA", "ARTES PARA REDES SOCIAIS", "AVENTAL", "AZULEJOS", "BACKDROP", "BALCÕES, PDV, QUIOSQUES, EXPOSITORES E TOTENS", "BANDEIRAS", "BANDEIROLAS", "BANDEJA DE DEGUSTAÇÃO", "BANNERS, FAIXAS, LONAS E TECIDOS", "BARALHOS", "BASTÃO DE LED", "BLOCO DE POST IT", "BLOCOS, COMANDAS, RECEITUÁRIOS E TALÕES", "BOIA PERSONALIZADA DECORATIVA", "BORRACHAS", "BOTTONS E PINS PERSONALIZADOS", "CAIXAS E EMBALAGENS", "CALENDÁRIOS E FOLHINHAS 2026", "CANECA, COPOS E TAÇAS", "CANETAS PROMOCIONAIS", "CANETAS", "CANUDOS", "CAPAS", "CARDÁPIOS", "CARIMBOS", "CARNÊS", "CARTÃO DE PROXIMIDADE", "CARTÃO DE VACINA", "CARTÃO PREMIADO", "CARTAZES", "CARTÕES DE VISITA EUROPEU", "CARTÕES DE VISITA MAX", "CARTÕES DE VISITA", "CARTÕES DUPLO", "CARTÕES FIDELIDADE", "CATÁLOGO", "CAVALETE", "CD E DVD", "CELULAR E ACESSÓRIOS", "CERTIFICADOS", "CILINDROS PARA FESTAS", "COBRE CAIXAS", "COBRE PLACA", "COMBOS DE PRODUTOS", "CONVITES", "COQUETELEIRA PARA ACADEMIA", "CORDÕES", "CRACHÁ", "CREDENCIAIS", "DELIVERY", "DISPLAYS", "DTF TÊXTIL", "DTF UV", "ENCARTE, TABLÓIDES E JORNAL", "ENVELOPES", "ESPELHO", "ESTOJOS E NÉCESSAIRES", "FACAS CORTE VINCO", "FICHA", "FILIPETAS", "FITA DE CETIM", "FITA SALVA CELULAR", "FOLDERS E MALA DIRETA", "FOLHAS AVULSAS", "FORRO DE BANDEJA", "FOTO PRODUTOS", "GARRAFAS E SQUEEZES", "ÍMÃS DE GELADEIRA", "IMPRESSÃO SUBLIMÁTICA", "INGRESSOS DE SEGURANÇA", "KIT CHURRASCO", "KIT QUEIJO", "KITS DE MOSTRUÁRIO", "LANÇAMENTOS", "LÁPIS E GIZ DE CERA", "LETRA CAIXA", "LINHA DE ATACADO", "LINHA TÊXTIL", "LINHA VESTUÁRIO", "LIXAS DE UNHA", "LIXEIRA PARA CARRO", "LUMINÁRIAS", "MARCADOR DE PÁGINA", "MÁSCARAS", "MINI CARTÃO", "MINI PANFLETO", "MÓBILE", "MOLDURA COM ACETATO", "NÃO PERTURBE", "PAINEL DE FESTA", "PANFLETOS, FLYERS E FOLHETOS", "PAPEL PARA PRESENTE", "PAPEL TIMBRADO", "PASTAS", "PLACAS", "PORTA CANECA ALÇA", "PORTA COPOS", "PORTA DOCUMENTOS", "POSTAIS", "PÔSTER", "PRODUTOS PARA FESTA", "PROJETO ARQUITETÔNICO", "PROMOÇÕES", "PULSEIRAS", "QUADROS DECORATIVOS", "QUEBRA CABEÇA IMANTADO", "RÉGUAS", "REVISTA", "RIFA", "ROLL UP", "RÓTULOS EM BOBINA PARA FRIOS E CONGELADOS", "RÓTULOS EM BOBINA", "RÓTULOS", "SACOCHILA", "SACOLAS E SACOS", "SOLAPAS", "SPLASH GONDOLA", "SUPORTE DE COPOS", "TAGS", "TAPETES E CAPACHOS", "TATUAGEM TEMPORÁRIA PERSONALIZADA", "TOPO PARA BOMBA DE GASOLINA", "TRENA", "URNA PERSONALIZADA", "VENTAROLA", "VISEIRAS", "WIND BANNER", "WOBBLER", "X BANNER OU INDOOR"];
+
+    const selectCat = document.getElementById('selectCat');
+    const buscaCod = document.getElementById('buscaCod');
+    const corpoTabela = document.getElementById('corpoTabela');
+
+    selectCat.innerHTML = '<option value="">-- Escolha uma Categoria --</option>';
+    listaCategorias.sort().forEach(cat => {
+        selectCat.innerHTML += `<option value="${cat}">${cat}</option>`;
+    });
+
+    function filtrar() {
+        const catValue = selectCat.value;
+        const codValue = buscaCod.value.toLowerCase().trim();
+        corpoTabela.innerHTML = "";
+
+        if (!catValue && !codValue) {
+            corpoTabela.innerHTML = '<tr><td colspan="6" class="msg-vazia">Selecione uma categoria ou digite um código para começar.</td></tr>';
+            return;
+        }
+
+        if (typeof allData === 'undefined') {
+            corpoTabela.innerHTML = '<tr><td colspan="6" class="msg-vazia" style="color:red">Erro: Arquivo "meus_dados.js" não encontrado.</td></tr>';
+            return;
+        }
+
+        allData.forEach(item => {
+            const vCat = (item.Categoria || "").toString();
+            const vCod = (item.Código || item.Codigo || "").toString().toLowerCase();
+
+            if ((!catValue || vCat === catValue) && (!codValue || vCod.includes(codValue))) {
+                
+                let pRaw = item["Preço R$"] || item.Preco || "0";
+                let pNum = parseFloat(pRaw.toString().replace('R$', '').replace(/\./g, '').replace(',', '.').trim()) || 0;
+                let pFinal = (pNum * 2.45) + 30;
+
+                // UNIÃO DA DESCRIÇÃO: Categoria - Descrição do Serviço
+                const descServico = item["Descrição do Serviço"] || item.Descricao || "";
+                const descricaoUnida = `${vCat} - ${descServico}`;
+
+                corpoTabela.innerHTML += `
+                    <tr>
+                        <td><strong>${item.Código || item.Codigo}</strong></td>
+                        <td>${descricaoUnida}</td>
+                        <td>${item.Cores || ""}</td>
+                        <td>${item.Qtde || ""}</td>
+                        <td>${item.Tam || ""}</td>
+                        <td class="preco">R$ ${pFinal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                    </tr>`;
+            }
+        });
+    }
+
+    selectCat.addEventListener('change', filtrar);
+    buscaCod.addEventListener('input', filtrar);
+    filtrar();
+</script>
+
+</body>
+</html>
