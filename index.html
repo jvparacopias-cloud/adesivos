@@ -2,102 +2,267 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Consulta Material Gráfico</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Orçamento Profissional</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
-    <div class="topo">
-        <h1>Consulta de Preços - Catálogo 2026</h1>
-    </div>
-    
-    <div class="filtros">
-        <div>
-            <label>Categoria:</label>
-            <select id="selectCat" style="width:100%"></select>
+    <div class="header">
+            <div class="warning-banner">ATENÇÃO: AS MEDIDAS DE ALTURA E COMPRIMENTO DEVEM SER EM CM</div>
+            
+            <div class="logo-wrapper">
+                <img src="LOGO PARÁ CÓPIAS.png" alt="Pará Cópias Logo" class="main-logo">
+            </div>
+            
+            <h1 id="titulo-pagina">ORÇAMENTO DE ADESIVOS</h1>
+            <p class="subtitle">Calculadora de Medidas e Materiais</p>
         </div>
-        <div>
-            <label>Buscar por Código:</label>
-            <input type="text" id="buscaCod" placeholder="Ex: GIFT1511" style="width:100%">
-        </div>
-    </div>
 
-    <table id="tabela">
-        <thead>
-            <tr>
-                <th>Código</th>
-                <th>Descrição (Categoria - Serviço)</th>
-                <th>Cores</th>
-                <th>Qtd</th>
-                <th>Tamanho</th>
-                <th>Preço Final (R$)</th>
-            </tr>
-        </thead>
-        <tbody id="corpoTabela"></tbody>
-    </table>
+    <div class="calculator-grid">
+        <div class="input-group product-select">
+            <label>Tipo de Produto</label>
+            <select id="tipoProduto" onchange="atualizarMateriais()">
+                <option value="adesivo">Adesivos</option>
+                <option value="acrilico">Acrílico</option>
+                <option value="mdf">MDF</option>
+                <option value="pvc">PVC / PS</option>
+                <option value="impressão">Impressão</option>
+            </select>
+        </div>
+
+        <select id="tipoImpressão" style="display: none;">
+            <option value="sulfite">Sulfite</option>
+            <option value="couche170">Couchê 170g</option>
+            <option value="couche300">Couchê 300g</option>
+            <option value="apfosco120">AP FOSCO 120G</option>
+            <option value="apfosco240">AP FOSCO 240G</option>
+        </select>
+
+        <div class="input-group">
+            <label>Quantidade Total</label>
+            <input type="number" id="quantidade" value="100" oninput="calcular()">
+        </div>
+
+        <div class="input-group">
+            <label>Qtd Linhas</label>
+            <input type="number" id="qtdLinhas" value="10" oninput="calcular()">
+        </div>
+
+        <div class="input-group highlight-blue">
+            <label>Qtd por linha</label>
+            <input type="number" id="qtdPorLinha" readonly>
+        </div>
+
+        <div class="input-group">
+            <label>Altura UND (cm)</label>
+            <input type="number" id="altura" value="6" oninput="calcular()">
+        </div>
+
+        <div class="input-group">
+            <label>Comprimento UND (cm)</label>
+            <input type="number" id="comprimento" value="6" oninput="calcular()">
+        </div>
+
+        <div class="input-group">
+            <label>Material / Tipo</label>
+            <select id="material" onchange="calcular()">
+                </select>
+        </div>
+
+        <div class="input-group highlight-blue">
+            <label>Espaços Comprimento (m)</label>
+            <input type="text" id="espacoComprimento" readonly>
+        </div>
+
+        <div class="input-group highlight-blue">
+            <label>Espaços Altura (m)</label>
+            <input type="text" id="espacoAltura" readonly>
+        </div>
+
+        <div class="input-group highlight-blue">
+            <label>Metro² Total</label>
+            <input type="text" id="metroQuadrado" readonly style="font-weight: bold;">
+        </div>
+
+        <div class="input-group result-total">
+            <label>Total (R$)</label>
+            <input type="text" id="valorTotal" readonly>
+        </div>
+
+        <div class="input-group result-rec">
+            <label>Valor Recomendado (R$)</label>
+            <input type="text" id="valorRecomendado" readonly>
+        </div>
+
+        <div class="input-group checkbox-group">
+            <label class="checkbox-container">
+                <input type="checkbox" id="aplicacao" onchange="calcular()">
+                Adicionar Aplicação (+ R$ 35,00/m²)
+            </label>
+        </div>
+    </div>
+    <div class="converter-section">
+        <h3>Conversor de Medidas</h3>
+        <div class="converter-grid">
+            <div class="input-group">
+                <label>De:</label>
+                <input type="number" id="valorDe" placeholder="0" oninput="converterMedida()">
+                <select id="unidadeDe" onchange="converterMedida()">
+                    <option value="mm">mm</option>
+                    <option value="cm" selected>cm</option>
+                    <option value="m">m</option>
+                    <option value="pol">polegadas</option>
+                </select>
+            </div>
+
+            <div class="converter-arrow">
+                <span>➞</span>
+            </div>
+
+            <div class="input-group">
+                <label>Para:</label>
+                <input type="text" id="valorPara" readonly placeholder="Resultado">
+                <select id="unidadePara" onchange="converterMedida()">
+                    <option value="mm">mm</option>
+                    <option value="cm">cm</option>
+                    <option value="m" selected>m</option>
+                    <option value="pol">polegadas</option>
+                </select>
+            </div>
+        </div>
+    </div>
 </div>
 
-<script src="meus_dados.js"></script>
-
 <script>
-    const listaCategorias = ["ABRIDORES E CHAVEIROS", "ACESSÓRIOS PARA COMPUTADORES", "ADESIVOS", "AGENDAS, CADERNOS E APOSTILAS", "ALMOFADA PERSONALIZADA", "ARTES PARA REDES SOCIAIS", "AVENTAL", "AZULEJOS", "BACKDROP", "BALCÕES, PDV, QUIOSQUES, EXPOSITORES E TOTENS", "BANDEIRAS", "BANDEIROLAS", "BANDEJA DE DEGUSTAÇÃO", "BANNERS, FAIXAS, LONAS E TECIDOS", "BARALHOS", "BASTÃO DE LED", "BLOCO DE POST IT", "BLOCOS, COMANDAS, RECEITUÁRIOS E TALÕES", "BOIA PERSONALIZADA DECORATIVA", "BORRACHAS", "BOTTONS E PINS PERSONALIZADOS", "CAIXAS E EMBALAGENS", "CALENDÁRIOS E FOLHINHAS 2026", "CANECA, COPOS E TAÇAS", "CANETAS PROMOCIONAIS", "CANETAS", "CANUDOS", "CAPAS", "CARDÁPIOS", "CARIMBOS", "CARNÊS", "CARTÃO DE PROXIMIDADE", "CARTÃO DE VACINA", "CARTÃO PREMIADO", "CARTAZES", "CARTÕES DE VISITA EUROPEU", "CARTÕES DE VISITA MAX", "CARTÕES DE VISITA", "CARTÕES DUPLO", "CARTÕES FIDELIDADE", "CATÁLOGO", "CAVALETE", "CD E DVD", "CELULAR E ACESSÓRIOS", "CERTIFICADOS", "CILINDROS PARA FESTAS", "COBRE CAIXAS", "COBRE PLACA", "COMBOS DE PRODUTOS", "CONVITES", "COQUETELEIRA PARA ACADEMIA", "CORDÕES", "CRACHÁ", "CREDENCIAIS", "DELIVERY", "DISPLAYS", "DTF TÊXTIL", "DTF UV", "ENCARTE, TABLÓIDES E JORNAL", "ENVELOPES", "ESPELHO", "ESTOJOS E NÉCESSAIRES", "FACAS CORTE VINCO", "FICHA", "FILIPETAS", "FITA DE CETIM", "FITA SALVA CELULAR", "FOLDERS E MALA DIRETA", "FOLHAS AVULSAS", "FORRO DE BANDEJA", "FOTO PRODUTOS", "GARRAFAS E SQUEEZES", "ÍMÃS DE GELADEIRA", "IMPRESSÃO SUBLIMÁTICA", "INGRESSOS DE SEGURANÇA", "KIT CHURRASCO", "KIT QUEIJO", "KITS DE MOSTRUÁRIO", "LANÇAMENTOS", "LÁPIS E GIZ DE CERA", "LETRA CAIXA", "LINHA DE ATACADO", "LINHA TÊXTIL", "LINHA VESTUÁRIO", "LIXAS DE UNHA", "LIXEIRA PARA CARRO", "LUMINÁRIAS", "MARCADOR DE PÁGINA", "MÁSCARAS", "MINI CARTÃO", "MINI PANFLETO", "MÓBILE", "MOLDURA COM ACETATO", "NÃO PERTURBE", "PAINEL DE FESTA", "PANFLETOS, FLYERS E FOLHETOS", "PAPEL PARA PRESENTE", "PAPEL TIMBRADO", "PASTAS", "PLACAS", "PORTA CANECA ALÇA", "PORTA COPOS", "PORTA DOCUMENTOS", "POSTAIS", "PÔSTER", "PRODUTOS PARA FESTA", "PROJETO ARQUITETÔNICO", "PROMOÇÕES", "PULSEIRAS", "QUADROS DECORATIVOS", "QUEBRA CABEÇA IMANTADO", "RÉGUAS", "REVISTA", "RIFA", "ROLL UP", "RÓTULOS EM BOBINA PARA FRIOS E CONGELADOS", "RÓTULOS EM BOBINA", "RÓTULOS", "SACOCHILA", "SACOLAS E SACOS", "SOLAPAS", "SPLASH GONDOLA", "SUPORTE DE COPOS", "TAGS", "TAPETES E CAPACHOS", "TATUAGEM TEMPORÁRIA PERSONALIZADA", "TOPO PARA BOMBA DE GASOLINA", "TRENA", "URNA PERSONALIZADA", "VENTAROLA", "VISEIRAS", "WIND BANNER", "WOBBLER", "X BANNER OU INDOOR"];
+    const materiaisData = {
+        adesivo: [
+            { nome: "Vinil Branco/Blackout/Transp.", preco: 135 },
+            { nome: "Vinil Transp. com tinta branca", preco: 220 },
+            { nome: "Vinil Laminado", preco: 170 },
+            { nome: "Vinil + Manta Magnética", preco: 450 },
+            { nome: "Vinil Micro Perfurado", preco: 180 }
+        ],
+        acrilico: [
+            { nome: "Transparente - Sem impressão", preco: 500 },
+            { nome: "Transparente - Com impressão", preco: 850 },
+            { nome: "Branco - Sem impressão", preco: 550 },
+            { nome: "Branco - Com impressão", preco: 750 },
+            { nome: "Preto - Sem impressão", preco: 550 },
+            { nome: "Preto - Com impressão", preco: 750 },
+            { nome: "Prata/Dourado/Rosê - Sem impressão", preco: 1400 }
+        ],
+        mdf: [
+            { nome: "MDF Cru - Corte", preco: 200 },
+            { nome: "MDF Cru + Branco - Corte", preco: 250 },
+            { nome: "MDF Cru + Branco - Corte + Impressão", preco: 450 }
+        ],
+        pvc: [
+            { nome: "PVC", preco: 320 },
+            { nome: "PS", preco: 300 }
+        ],
+        impressão: [
+            {nome: "Preto e Branco", preco: 2}
+        ]
+    };
 
-    const selectCat = document.getElementById('selectCat');
-    const buscaCod = document.getElementById('buscaCod');
-    const corpoTabela = document.getElementById('corpoTabela');
-
-    selectCat.innerHTML = '<option value="">-- Escolha uma Categoria --</option>';
-    listaCategorias.sort().forEach(cat => {
-        selectCat.innerHTML += `<option value="${cat}">${cat}</option>`;
-    });
-
-    function filtrar() {
-        const catValue = selectCat.value;
-        const codValue = buscaCod.value.toLowerCase().trim();
-        corpoTabela.innerHTML = "";
-
-        if (!catValue && !codValue) {
-            corpoTabela.innerHTML = '<tr><td colspan="6" class="msg-vazia">Selecione uma categoria ou digite um código para começar.</td></tr>';
-            return;
+    function atualizarMateriais() {
+        const tipo = document.getElementById('tipoProduto').value;
+        const selectMaterial = document.getElementById('material');
+        const titulo = document.getElementById('titulo-pagina');
+        const tipoImp = document.getElementById('tipoImpressão');
+        
+        titulo.innerText = "ORÇAMENTO DE " + tipo.toUpperCase().replace('_', ' ');
+        if (tipo === "impressão") {
+            tipoImp.style.display = "block";
+        } else {
+            tipoImp.style.display = "none";
         }
+        selectMaterial.innerHTML = "";
 
-        if (typeof allData === 'undefined') {
-            corpoTabela.innerHTML = '<tr><td colspan="6" class="msg-vazia" style="color:red">Erro: Arquivo "meus_dados.js" não encontrado.</td></tr>';
-            return;
-        }
-
-        allData.forEach(item => {
-            const vCat = (item.Categoria || "").toString();
-            const vCod = (item.Código || item.Codigo || "").toString().toLowerCase();
-
-            if ((!catValue || vCat === catValue) && (!codValue || vCod.includes(codValue))) {
-                
-                let pRaw = item["Preço R$"] || item.Preco || "0";
-                let pNum = parseFloat(pRaw.toString().replace('R$', '').replace(/\./g, '').replace(',', '.').trim()) || 0;
-                let pFinal = (pNum * 2.45) + 30;
-
-                // UNIÃO DA DESCRIÇÃO: Categoria - Descrição do Serviço
-                const descServico = item["Descrição do Serviço"] || item.Descricao || "";
-                const descricaoUnida = `${vCat} - ${descServico}`;
-
-                corpoTabela.innerHTML += `
-                    <tr>
-                        <td><strong>${item.Código || item.Codigo}</strong></td>
-                        <td>${descricaoUnida}</td>
-                        <td>${item.Cores || ""}</td>
-                        <td>${item.Qtde || ""}</td>
-                        <td>${item.Tam || ""}</td>
-                        <td class="preco">R$ ${pFinal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-                    </tr>`;
-            }
+        materiaisData[tipo].forEach(item => {
+            let option = document.createElement('option');
+            option.value = item.preco;
+            option.text = `${item.nome} (R$ ${item.preco},00)`;
+            selectMaterial.appendChild(option);
         });
+        
+        if (tipo === "impressão") {
+            calcularImp();
+        } else {
+            calcular();
+        }      
     }
 
-    selectCat.addEventListener('change', filtrar);
-    buscaCod.addEventListener('input', filtrar);
-    filtrar();
-</script>
+    function calcularImp() {
+        
+    }
 
+    function calcular() {
+        const tipo = document.getElementById('tipoProduto').value;
+        const qtd = parseFloat(document.getElementById('quantidade').value) || 0;
+        const linhas = parseFloat(document.getElementById('qtdLinhas').value) || 1;
+        const altUnd = parseFloat(document.getElementById('altura').value) || 0;
+        const compUnd = parseFloat(document.getElementById('comprimento').value) || 0;
+        let precoM2 = parseFloat(document.getElementById('material').value) || 0;
+        const aplicacaoChecked = document.getElementById('aplicacao').checked;
+        
+        if (aplicacaoChecked) { precoM2 += 35; }
+
+        // AJUSTE: Se for PVC, a margem é 0. Caso contrário, 0.4.
+        const margemArte = (tipo === 'pvc') ? 0 : 0.4; 
+
+        const porLinha = Math.floor(qtd / linhas);
+        document.getElementById('qtdPorLinha').value = porLinha;
+
+        const espacoComp = (porLinha * (compUnd / 100)) + ((margemArte / 100) * (porLinha - 1));
+        document.getElementById('espacoComprimento').value = espacoComp.toLocaleString('pt-BR', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+
+        const espacoAlt = ((linhas / 100) * altUnd) + ((margemArte / 100) * (linhas - 1));
+        document.getElementById('espacoAltura').value = espacoAlt.toLocaleString('pt-BR', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+
+        const m2 = espacoComp * espacoAlt;
+        document.getElementById('metroQuadrado').value = m2.toFixed(6).replace('.', ',');
+
+        const total = m2 * precoM2;
+        document.getElementById('valorTotal').value = total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 5 });
+
+        let recomendado = total < 30 ? 35 : Math.ceil(total / 5) * 5;
+        document.getElementById('valorRecomendado').value = recomendado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function converterMedida() {
+        const valorDe = parseFloat(document.getElementById('valorDe').value);
+        const unidadeDe = document.getElementById('unidadeDe').value;
+        const unidadePara = document.getElementById('unidadePara').value;
+        const inputResultado = document.getElementById('valorPara');
+
+        if (isNaN(valorDe)) {
+            inputResultado.value = "";
+            return;
+        }
+
+        // Fatores de conversão para Milímetros (base)
+        const paraMilimetro = {
+            mm: 1,
+            cm: 10,
+            m: 1000,
+            pol: 25.4
+        };
+
+        // Converte de Origem -> Milímetros
+        const valorEmMm = valorDe * paraMilimetro[unidadeDe];
+
+        // Converte de Milímetros -> Destino
+        const resultado = valorEmMm / paraMilimetro[unidadePara];
+
+        // Formatação: se for polegada, mostra mais casas decimais
+        const casas = unidadePara === 'pol' ? 4 : 2;
+        inputResultado.value = resultado.toLocaleString('pt-BR', { maximumFractionDigits: casas });
+    }
+
+    window.onload = atualizarMateriais;
+</script>
 </body>
 </html>
