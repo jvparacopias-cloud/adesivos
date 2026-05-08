@@ -32,13 +32,21 @@
             </select>
         </div>
 
-        <select id="tipoImpressão" style="display: none;">
-            <option value="sulfite">Sulfite</option>
-            <option value="couche170">Couchê 170g</option>
-            <option value="couche300">Couchê 300g</option>
-            <option value="apfosco120">AP FOSCO 120G</option>
-            <option value="apfosco240">AP FOSCO 240G</option>
-        </select>
+        <div class="input-group" id="tipoImpressão" style="display: none;">
+            <label>Tipo Folha</label>
+            <select id="tipoFolha" onchange="atualizarMateriais()">
+                <option value="sulfiteA4">Sulfite A4</option>
+                <option value="sulfiteA3">Sulfite A3</option>
+                <option value="couche170gA4">Couchê 170g A4</option>
+                <option value="couche170A3">Couchê 170g A3</option>
+                <option value="couche300A4">Couchê 300g A4</option>
+                <option value="couche300A3">Couchê 300g A3</option>
+                <option value="ap240gA4">AP 240g A4</option>
+                <option value="ap240gA3">AP 240g A3</option>
+            </select>
+        </div>
+
+        <div id="camposNormais">
 
         <div class="input-group">
             <label>Quantidade Total</label>
@@ -67,8 +75,7 @@
 
         <div class="input-group">
             <label>Material / Tipo</label>
-            <select id="material" onchange="calcular()">
-                </select>
+            <select id="material" onchange="calcular()"></select>
         </div>
 
         <div class="input-group highlight-blue">
@@ -102,7 +109,39 @@
                 Adicionar Aplicação (+ R$ 35,00/m²)
             </label>
         </div>
+    </div> <!-- fecha camposNormais -->
+</div>
+
+    <div class="calculator-grid" id="gridImpressao" style="display: none;">
+        <div class="input-group">
+            <label>Tipo de Impressão</label>
+            <select id="materialImp" onchange="calcularImp()"></select>
+        </div>
+
+        <div class="input-group">
+            <label>Quantidade de folhas</label>
+            <input type="number" id="qtdFolhas" value="1" oninput="calcularImp()">
+        </div>
+
+        <div class="input-group">
+            <label>Frente e verso?</label>
+            <select id="frenteVerso" onchange="calcularImp()">
+                <option value="nao">Não</option>
+                <option value="sim">Sim</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>Valor unitário (R$)</label>
+            <input type="text" id="valorUnitario" readonly>
+        </div>
+
+        <div class="input-group result-total">
+            <label>Total (R$)</label>
+            <input type="text" id="totalImpressao" readonly>
+        </div>
     </div>
+
     <div class="converter-section">
         <h3>Conversor de Medidas</h3>
         <div class="converter-grid">
@@ -167,37 +206,170 @@
         ]
     };
 
+    const materiaisImp = {
+        sulfiteA4: [
+            { nome: "Preto e Branco"},
+            { nome: "Colorido | Jato "},
+            { nome: "Colorido | Laser" }
+        ],
+        sulfiteA3: [
+            { nome: "Impressão A3 Preto e Branco" },
+            { nome: "Impressão A3 Colorida" }
+        ],
+        couche170gA4: [
+            { nome: "Impressão Couchê 170g" }
+        ],
+        couche170A3: [
+            { nome: "Impressão Couchê 170g"}
+        ],
+        couche300A4: [
+            { nome: "Impressão Couchê 300g" }
+        ],
+        couche300A3: [
+            { nome: "Impressão Couchê 300g" }
+        ],
+        ap240gA4: [
+            { nome: "Impressão AP Fosco 240g"}
+        ],
+        ap240gA3: [
+            { nome: "Impressão AP Fosco 240g"}
+        ],
+    }
+
     function atualizarMateriais() {
+        const camposNormais = document.getElementById('camposNormais');
+        const gridImp = document.getElementById('gridImpressao');
         const tipo = document.getElementById('tipoProduto').value;
         const selectMaterial = document.getElementById('material');
+        const selectMaterialImp = document.getElementById('materialImp');
         const titulo = document.getElementById('titulo-pagina');
         const tipoImp = document.getElementById('tipoImpressão');
-        
+
         titulo.innerText = "ORÇAMENTO DE " + tipo.toUpperCase().replace('_', ' ');
-        if (tipo === "impressão") {
-            tipoImp.style.display = "block";
-        } else {
-            tipoImp.style.display = "none";
-        }
+
         selectMaterial.innerHTML = "";
 
-        materiaisData[tipo].forEach(item => {
-            let option = document.createElement('option');
-            option.value = item.preco;
-            option.text = `${item.nome} (R$ ${item.preco},00)`;
-            selectMaterial.appendChild(option);
-        });
-        
         if (tipo === "impressão") {
+            camposNormais.style.display = "none";
+            gridImp.style.display = "grid";
+            tipoImp.style.display = "block";
+
+            const tipoFolha = document.getElementById('tipoFolha').value;
+
+            materiaisImp[tipoFolha].forEach(item => {
+            let option = document.createElement('option');
+            option.value = item.nome;
+            option.text = item.nome;
+            selectMaterialImp.appendChild(option);
+            });
+
             calcularImp();
+
         } else {
+            camposNormais.style.display = "contents";
+            gridImp.style.display = "none";
+            tipoImp.style.display = "none";
+
+            materiaisData[tipo].forEach(item => {
+                let option = document.createElement('option');
+                option.value = item.preco;
+                option.text = `${item.nome} (R$ ${item.preco},00)`;
+                selectMaterial.appendChild(option);
+            });
+
             calcular();
-        }      
+        }
     }
 
     function calcularImp() {
-        
+        const folhas = parseInt(document.getElementById('qtdFolhas').value) || 0;
+        const frenteVerso = document.getElementById('frenteVerso').value;
+        const tipoFolha = document.getElementById('tipoFolha').value;
+        const material = document.getElementById('materialImp').value;
+
+        let valorUnit = 0;
+
+        // SULFITE A4
+        if (tipoFolha === "sulfiteA4") {
+            if (material === "Preto e Branco") {
+                if (folhas === 1) valorUnit = 2.50;
+                else if (folhas <= 20) valorUnit = 0.70;
+                else if (folhas <= 49) valorUnit = 0.35;
+                else if (folhas <= 999) valorUnit = 0.25;
+                else valorUnit = 0.20;
+            }
+
+            if (material === "Colorido | Jato ") {
+                if (folhas === 1) valorUnit = 2.50;
+                else if (folhas <= 49) valorUnit = 1.20;
+                else if (folhas <= 999) valorUnit = 0.35;
+                else valorUnit = 0.30;
+            }
+
+            if (material === "Colorido | Laser") {
+                if (folhas === 1) valorUnit = 4.00;
+                else if (folhas <= 49) valorUnit = 2.20;
+                else valorUnit = 1.80;
+            }
+        }
+
+        // COUCHÊ 170
+        else if (tipoFolha === "couche170gA4") {
+            valorUnit = folhas <= 15 ? 6.00 : 4.50;
+        }
+        else if (tipoFolha === "couche170A3") {
+            valorUnit = folhas <= 15 ? 10.00 : 9.00;
+        }
+
+        // COUCHÊ 300
+        else if (tipoFolha === "couche300A4") {
+            valorUnit = folhas <= 15 ? 7.00 : 6.00;
+        }
+        else if (tipoFolha === "couche300A3") {
+            valorUnit = folhas <= 15 ? 12.00 : 9.00;
+        }
+
+        // AP 240
+        else if (tipoFolha === "ap240gA4") {
+            valorUnit = folhas <= 15 ? 8.00 : 7.00;
+        }
+        else if (tipoFolha === "ap240gA3") {
+            valorUnit = folhas <= 15 ? 12.00 : 9.00;
+        }
+
+    document.getElementById('valorUnitario').value =
+    valorUnit.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    });
+
+    let adicionalVerso = 0;
+
+    if (frenteVerso === "sim") {
+        // Preto e branco
+        if (material === "Preto e Branco") {
+            adicionalVerso = 0.20;
+        }
+
+        // Jato colorido
+        else if (material === "Colorido | Jato ") {
+            adicionalVerso = 0.35;
+        }
+
+        // Laser, Couchê e AP
+        else {
+            adicionalVerso = 1.80;
+        }
     }
+
+    const total = folhas * (valorUnit + adicionalVerso);
+
+    document.getElementById('totalImpressao').value =
+        total.toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+    });
+}
 
     function calcular() {
         const tipo = document.getElementById('tipoProduto').value;
