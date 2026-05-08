@@ -249,21 +249,23 @@
 
         selectMaterial.innerHTML = "";
 
-        if (tipo === "impressão") {
-            camposNormais.style.display = "none";
-            gridImp.style.display = "grid";
-            tipoImp.style.display = "block";
+    if (tipo === "impressão") {
+        camposNormais.style.display = "none";
+        gridImp.style.display = "grid";
+        tipoImp.style.display = "block";
 
-            const tipoFolha = document.getElementById('tipoFolha').value;
+        const tipoFolha = document.getElementById('tipoFolha').value;
 
-            materiaisImp[tipoFolha].forEach(item => {
+        selectMaterialImp.innerHTML = "";
+
+        materiaisImp[tipoFolha].forEach(item => {
             let option = document.createElement('option');
             option.value = item.nome;
             option.text = item.nome;
             selectMaterialImp.appendChild(option);
-            });
+        });
 
-            calcularImp();
+        calcularImp();
 
         } else {
             camposNormais.style.display = "contents";
