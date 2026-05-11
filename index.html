@@ -339,12 +339,6 @@
             valorUnit = folhas <= 15 ? 12.00 : 9.00;
         }
 
-    document.getElementById('valorUnitario').value =
-    valorUnit.toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-    });
-
     let adicionalVerso = 0;
 
     if (frenteVerso === "sim") {
@@ -364,7 +358,15 @@
         }
     }
 
-    const total = folhas * (valorUnit + adicionalVerso);
+    valorUnit = valorUnit + adicionalVerso;
+
+    document.getElementById('valorUnitario').value =
+    valorUnit.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    });
+
+    const total = folhas * (valorUnit);
 
     document.getElementById('totalImpressao').value =
         total.toLocaleString('pt-BR', {
