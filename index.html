@@ -140,6 +140,26 @@
             <label>Total (R$)</label>
             <input type="text" id="totalImpressao" readonly>
         </div>
+
+        <div class="input-group">
+            <label>Largura item (cm)</label>
+            <input type="number" id="larguraItem" value="5" oninput="calcularEncaixe()">
+        </div>
+
+        <div class="input-group">
+            <label>Altura item (cm)</label>
+            <input type="number" id="alturaItem" value="2" oninput="calcularEncaixe()">
+        </div>
+
+        <div class="input-group highlight-blue">
+            <label>Qtd máxima por folha</label>
+            <input type="text" id="qtdMaxima" readonly>
+        </div>
+
+        <div class="preview-wrapper">
+            <h3>Pré-visualização</h3>
+            <div id="previewFolha"></div>
+        </div>
     </div>
 
     <div class="converter-section">
@@ -236,6 +256,76 @@
         ],
     }
 
+    function calcularEncaixe() {
+        const tipoFolha = document.getElementById('tipoFolha').value;
+        const larguraItem = parseFloat(document.getElementById('larguraItem').value) || 0;
+        const alturaItem = parseFloat(document.getElementById('alturaItem').value) || 0;
+
+        let larguraPapel = 21;
+        let alturaPapel = 29.7;
+
+        if (tipoFolha.includes("A3")) {
+            larguraPapel = 29.7;
+            alturaPapel = 42;
+        }
+
+        // testa normal
+        const colunas1 = Math.floor(larguraPapel / larguraItem);
+        const linhas1 = Math.floor(alturaPapel / alturaItem);
+        const total1 = colunas1 * linhas1;
+
+        // testa rotacionado
+        const colunas2 = Math.floor(larguraPapel / alturaItem);
+        const linhas2 = Math.floor(alturaPapel / larguraItem);
+        const total2 = colunas2 * linhas2;
+
+        let melhor = {};
+        
+        if (total1 >= total2) {
+            melhor = {
+                largura: larguraItem,
+                altura: alturaItem,
+                colunas: colunas1,
+                linhas: linhas1,
+                total: total1
+            };
+        } else {
+            melhor = {
+                largura: alturaItem,
+                altura: larguraItem,
+                colunas: colunas2,
+                linhas: linhas2,
+                total: total2
+            };
+        }
+
+        document.getElementById('qtdMaxima').value = melhor.total;
+
+        desenharPreview(melhor, larguraPapel, alturaPapel);
+    }
+
+    function desenharPreview(config, larguraPapel, alturaPapel) {
+        const preview = document.getElementById('previewFolha');
+        preview.innerHTML = "";
+
+        const escalaX = 300 / larguraPapel;
+        const escalaY = 420 / alturaPapel;
+
+        for (let linha = 0; linha < config.linhas; linha++) {
+            for (let col = 0; col < config.colunas; col++) {
+                const div = document.createElement('div');
+                div.classList.add('retangulo');
+
+                div.style.width = `${config.largura * escalaX}px`;
+                div.style.height = `${config.altura * escalaY}px`;
+                div.style.left = `${col * config.largura * escalaX}px`;
+                div.style.top = `${linha * config.altura * escalaY}px`;
+
+                preview.appendChild(div);
+            }
+        }
+    }
+
     function atualizarMateriais() {
         const camposNormais = document.getElementById('camposNormais');
         const gridImp = document.getElementById('gridImpressao');
@@ -266,6 +356,7 @@
         });
 
         calcularImp();
+        calcularEncaixe();
 
         } else {
             camposNormais.style.display = "contents";
@@ -312,6 +403,19 @@
                 if (folhas === 1) valorUnit = 4.00;
                 else if (folhas <= 49) valorUnit = 2.20;
                 else valorUnit = 1.80;
+            }
+        }
+
+        // Sulfite A3
+        else if (tipoFolha === "sulfiteA3") {
+            if (material === "Impressão A3 Preto e Branco") {
+                if (folhas <= 20) valorUnit = 6.00;
+                else valorUnit = 5.00;
+            }
+
+            if (material === "Impressão A3 Colorida") {
+                if (folhas <= 20) valorUnit = 7.00;
+                else valorUnit = 5.00;
             }
         }
 
