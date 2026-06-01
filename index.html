@@ -34,7 +34,7 @@
 
         <div class="input-group" id="tipoImpressão" style="display: none;">
             <label>Tipo Folha</label>
-            <select id="tipoFolha" onchange="atualizarMateriais()">
+            <select id="tipoFolha" onchange="atualizarMateriais(); calcularImp();">
                 <option value="sulfiteA4">Sulfite A4</option>
                 <option value="sulfiteA3">Sulfite A3</option>
                 <option value="couche170gA4">Couchê 170g A4</option>
@@ -43,6 +43,8 @@
                 <option value="couche300A3">Couchê 300g A3</option>
                 <option value="ap240gA4">AP 240g A4</option>
                 <option value="ap240gA3">AP 240g A3</option>
+                <option value="adesivopapelA4">Papel Adesivo A4</option>
+                <option value="adesivopapelA3">Papel Adesivo A3</option>
             </select>
         </div>
 
@@ -126,6 +128,14 @@
         <div class="input-group">
             <label>Frente e verso?</label>
             <select id="frenteVerso" onchange="calcularImp()">
+                <option value="nao">Não</option>
+                <option value="sim">Sim</option>
+            </select>
+        </div>
+
+        <div class="input-group" id="grupoCorte" style="display:none;">
+            <label>Corte?</label>
+            <select id="corte" onchange="calcularImp()">
                 <option value="nao">Não</option>
                 <option value="sim">Sim</option>
             </select>
@@ -254,15 +264,33 @@
         ap240gA3: [
             { nome: "Impressão AP Fosco 240g"}
         ],
+        adesivopapelA4: [
+            {nome: "Impressão Papel Adesivo A4"}
+        ],
+        adesivopapelA3: [
+            {nome: "Impressão Papel Adesivo A3"}
+        ],
     }
 
     function calcularEncaixe() {
         const tipoFolha = document.getElementById('tipoFolha').value;
+        const grupoCorte = document.getElementById('grupoCorte');
         const larguraItem = parseFloat(document.getElementById('larguraItem').value) || 0;
         const alturaItem = parseFloat(document.getElementById('alturaItem').value) || 0;
 
         let larguraPapel = 21;
         let alturaPapel = 29.7;
+
+        if (
+            tipoFolha === "couche300A3" ||
+            tipoFolha === "ap240gA3" ||
+            tipoFolha === "adesivopapelA3"
+        ) {
+            grupoCorte.style.display = "flex";
+        } else {
+            grupoCorte.style.display = "none";
+            document.getElementById('corte').value = "nao";
+        }
 
         if (tipoFolha.includes("A3")) {
             larguraPapel = 29.7;
@@ -379,6 +407,7 @@
         const frenteVerso = document.getElementById('frenteVerso').value;
         const tipoFolha = document.getElementById('tipoFolha').value;
         const material = document.getElementById('materialImp').value;
+        const corte = document.getElementById('corte')?.value || "nao";
 
         let valorUnit = 0;
 
@@ -443,6 +472,14 @@
             valorUnit = folhas <= 15 ? 12.00 : 9.00;
         }
 
+        // ADESIVO 
+        else if (tipoFolha === "adesivopapelA4") {
+            valorUnit = folhas <= 20 ? 10.00 : 9.00;
+        }
+        else if (tipoFolha === "adesivopapelA3") {
+            valorUnit = folhas <= 15 ? 18.00 : 15.00;
+        }
+
     let adicionalVerso = 0;
 
     if (frenteVerso === "sim") {
@@ -463,6 +500,18 @@
     }
 
     valorUnit = valorUnit + adicionalVerso;
+
+    // Adicional de corte
+    if (
+        corte === "sim" &&
+        (
+            tipoFolha === "couche300A3" ||
+            tipoFolha === "ap240gA3" ||
+            tipoFolha === "adesivopapelA3"
+        )
+    ) {
+        valorUnit += 5;
+    }
 
     document.getElementById('valorUnitario').value =
     valorUnit.toLocaleString('pt-BR', {
