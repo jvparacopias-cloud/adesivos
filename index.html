@@ -4,207 +4,636 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora de Orçamento Profissional</title>
-    <link rel="stylesheet" href="style.css">
+    <link class="component-style" rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-            <div class="warning-banner">ATENÇÃO: AS MEDIDAS DE ALTURA E COMPRIMENTO DEVEM SER EM CM</div>
-            
-            <div class="logo-wrapper">
-                <img src="LOGO PARÁ CÓPIAS.png" alt="Pará Cópias Logo" class="main-logo">
-            </div>
-            
+        <div class="warning-banner">ATENÇÃO: AS MEDIDAS DE ALTURA E COMPRIMENTO DEVEM SER EM CM</div>
+        
+        <div class="logo-wrapper">
+            <img src="LOGO PARÁ CÓPIAS.png" alt="Pará Cópias Logo" class="main-logo">
+        </div>
+    </div>
+
+    <div class="tab-container">
+        <button class="tab-button active" onclick="switchTab('orcamento')">Orçamento</button>
+        <button class="tab-button" onclick="switchTab('produtos')">Produtos</button>
+    </div>
+
+    <div id="tab-orcamento" class="tab-content active">
+        <div class="header" style="padding-top: 15px; padding-bottom: 0;">
             <h1 id="titulo-pagina">ORÇAMENTO DE ADESIVOS</h1>
             <p class="subtitle">Calculadora de Medidas e Materiais</p>
         </div>
 
-    <div class="calculator-grid">
-        <div class="input-group product-select">
-            <label>Tipo de Produto</label>
-            <select id="tipoProduto" onchange="atualizarMateriais()">
-                <option value="adesivo">Adesivos</option>
-                <option value="acrilico">Acrílico</option>
-                <option value="mdf">MDF</option>
-                <option value="pvc">PVC / PS</option>
-                <option value="impressão">Impressão</option>
-            </select>
+        <div class="calculator-grid">
+            <div class="input-group product-select">
+                <label>Tipo de Produto</label>
+                <select id="tipoProduto" onchange="atualizarMateriais()">
+                    <option value="adesivo">Adesivos</option>
+                    <option value="acrilico">Acrílico</option>
+                    <option value="mdf">MDF</option>
+                    <option value="pvc">PVC / PS</option>
+                    <option value="impressão">Impressão</option>
+                </select>
+            </div>
+
+            <div class="input-group" id="tipoImpressão" style="display: none;">
+                <label>Tipo Folha</label>
+                <select id="tipoFolha" onchange="atualizarMateriais(); calcularImp();">
+                    <option value="sulfiteA4">Sulfite A4</option>
+                    <option value="sulfiteA3">Sulfite A3</option>
+                    <option value="couche170gA4">Couchê 170g A4</option>
+                    <option value="couche170A3">Couchê 170g A3</option>
+                    <option value="couche300A4">Couchê 300g A4</option>
+                    <option value="couche300A3">Couchê 300g A3</option>
+                    <option value="ap240gA4">AP 240g A4</option>
+                    <option value="ap240gA3">AP 240g A3</option>
+                    <option value="adesivopapelA4">Papel Adesivo A4</option>
+                    <option value="adesivopapelA3">Papel Adesivo A3</option>
+                </select>
+            </div>
+
+            <div id="camposNormais" style="display: contents;">
+                <div class="input-group">
+                    <label>Quantidade Total</label>
+                    <input type="number" id="quantidade" value="100" oninput="calcular()">
+                </div>
+
+                <div class="input-group">
+                    <label>Qtd Linhas</label>
+                    <input type="number" id="qtdLinhas" value="10" oninput="calcular()">
+                </div>
+
+                <div class="input-group highlight-blue">
+                    <label>Qtd por linha</label>
+                    <input type="number" id="qtdPorLinha" readonly>
+                </div>
+
+                <div class="input-group">
+                    <label>Altura UND (cm)</label>
+                    <input type="number" id="altura" value="6" oninput="calcular()">
+                </div>
+
+                <div class="input-group">
+                    <label>Comprimento UND (cm)</label>
+                    <input type="number" id="comprimento" value="6" oninput="calcular()">
+                </div>
+
+                <div class="input-group">
+                    <label>Material / Tipo</label>
+                    <select id="material" onchange="calcular()"></select>
+                </div>
+
+                <div class="input-group highlight-blue">
+                    <label>Espaços Comprimento (m)</label>
+                    <input type="text" id="espacoComprimento" readonly>
+                </div>
+
+                <div class="input-group highlight-blue">
+                    <label>Espaços Altura (m)</label>
+                    <input type="text" id="espacoAltura" readonly>
+                </div>
+
+                <div class="input-group highlight-blue">
+                    <label>Metro² Total</label>
+                    <input type="text" id="metroQuadrado" readonly style="font-weight: bold;">
+                </div>
+
+                <div class="input-group result-total">
+                    <label>Total (R$)</label>
+                    <input type="text" id="valorTotal" readonly>
+                </div>
+
+                <div class="input-group result-rec">
+                    <label>Valor Recomendado (R$)</label>
+                    <input type="text" id="valorRecomendado" readonly>
+                </div>
+
+                <div class="input-group checkbox-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="aplicacao" onchange="calcular()">
+                        Adicionar Aplicação (+ R$ 35,00/m²)
+                    </label>
+                </div>
+            </div>
         </div>
 
-        <div class="input-group" id="tipoImpressão" style="display: none;">
-            <label>Tipo Folha</label>
-            <select id="tipoFolha" onchange="atualizarMateriais(); calcularImp();">
-                <option value="sulfiteA4">Sulfite A4</option>
-                <option value="sulfiteA3">Sulfite A3</option>
-                <option value="couche170gA4">Couchê 170g A4</option>
-                <option value="couche170A3">Couchê 170g A3</option>
-                <option value="couche300A4">Couchê 300g A4</option>
-                <option value="couche300A3">Couchê 300g A3</option>
-                <option value="ap240gA4">AP 240g A4</option>
-                <option value="ap240gA3">AP 240g A3</option>
-                <option value="adesivopapelA4">Papel Adesivo A4</option>
-                <option value="adesivopapelA3">Papel Adesivo A3</option>
-            </select>
+        <div class="calculator-grid" id="gridImpressao" style="display: none;">
+            <div class="input-group">
+                <label>Tipo de Impressão</label>
+                <select id="materialImp" onchange="calcularImp()"></select>
+            </div>
+
+            <div class="input-group">
+                <label>Quantidade de folhas</label>
+                <input type="number" id="qtdFolhas" value="1" oninput="calcularImp()">
+            </div>
+
+            <div class="input-group">
+                <label>Frente e verso?</label>
+                <select id="frenteVerso" onchange="calcularImp()">
+                    <option value="nao">Não</option>
+                    <option value="sim">Sim</option>
+                </select>
+            </div>
+
+            <div class="input-group" id="grupoCorte" style="display:none;">
+                <label>Corte?</label>
+                <select id="corte" onchange="calcularImp()">
+                    <option value="nao">Não</option>
+                    <option value="sim">Sim</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Valor unitário (R$)</label>
+                <input type="text" id="valorUnitario" readonly>
+            </div>
+
+            <div class="input-group result-total">
+                <label>Total (R$)</label>
+                <input type="text" id="totalImpressao" readonly>
+            </div>
+
+            <div class="input-group">
+                <label>Largura item (cm)</label>
+                <input type="number" id="larguraItem" value="5" oninput="calcularEncaixe()">
+            </div>
+
+            <div class="input-group">
+                <label>Altura item (cm)</label>
+                <input type="number" id="alturaItem" value="2" oninput="calcularEncaixe()">
+            </div>
+
+            <div class="input-group highlight-blue">
+                <label>Qtd máxima por folha</label>
+                <input type="text" id="qtdMaxima" readonly>
+            </div>
+
+            <div class="preview-wrapper">
+                <h3>Pré-visualização</h3>
+                <div id="previewFolha"></div>
+            </div>
         </div>
 
-        <div id="camposNormais">
+        <div class="converter-section">
+            <h3>Conversor de Medidas</h3>
+            <div class="converter-grid">
+                <div class="input-group">
+                    <label>De:</label>
+                    <input type="number" id="valorDe" placeholder="0" oninput="converterMedida()">
+                    <select id="unidadeDe" onchange="converterMedida()">
+                        <option value="mm">mm</option>
+                        <option value="cm" selected>cm</option>
+                        <option value="m">m</option>
+                        <option value="pol">polegadas</option>
+                    </select>
+                </div>
 
-        <div class="input-group">
-            <label>Quantidade Total</label>
-            <input type="number" id="quantidade" value="100" oninput="calcular()">
-        </div>
+                <div class="converter-arrow">
+                    <span>➞</span>
+                </div>
 
-        <div class="input-group">
-            <label>Qtd Linhas</label>
-            <input type="number" id="qtdLinhas" value="10" oninput="calcular()">
-        </div>
-
-        <div class="input-group highlight-blue">
-            <label>Qtd por linha</label>
-            <input type="number" id="qtdPorLinha" readonly>
-        </div>
-
-        <div class="input-group">
-            <label>Altura UND (cm)</label>
-            <input type="number" id="altura" value="6" oninput="calcular()">
-        </div>
-
-        <div class="input-group">
-            <label>Comprimento UND (cm)</label>
-            <input type="number" id="comprimento" value="6" oninput="calcular()">
-        </div>
-
-        <div class="input-group">
-            <label>Material / Tipo</label>
-            <select id="material" onchange="calcular()"></select>
-        </div>
-
-        <div class="input-group highlight-blue">
-            <label>Espaços Comprimento (m)</label>
-            <input type="text" id="espacoComprimento" readonly>
-        </div>
-
-        <div class="input-group highlight-blue">
-            <label>Espaços Altura (m)</label>
-            <input type="text" id="espacoAltura" readonly>
-        </div>
-
-        <div class="input-group highlight-blue">
-            <label>Metro² Total</label>
-            <input type="text" id="metroQuadrado" readonly style="font-weight: bold;">
-        </div>
-
-        <div class="input-group result-total">
-            <label>Total (R$)</label>
-            <input type="text" id="valorTotal" readonly>
-        </div>
-
-        <div class="input-group result-rec">
-            <label>Valor Recomendado (R$)</label>
-            <input type="text" id="valorRecomendado" readonly>
-        </div>
-
-        <div class="input-group checkbox-group">
-            <label class="checkbox-container">
-                <input type="checkbox" id="aplicacao" onchange="calcular()">
-                Adicionar Aplicação (+ R$ 35,00/m²)
-            </label>
-        </div>
-    </div> <!-- fecha camposNormais -->
-</div>
-
-    <div class="calculator-grid" id="gridImpressao" style="display: none;">
-        <div class="input-group">
-            <label>Tipo de Impressão</label>
-            <select id="materialImp" onchange="calcularImp()"></select>
-        </div>
-
-        <div class="input-group">
-            <label>Quantidade de folhas</label>
-            <input type="number" id="qtdFolhas" value="1" oninput="calcularImp()">
-        </div>
-
-        <div class="input-group">
-            <label>Frente e verso?</label>
-            <select id="frenteVerso" onchange="calcularImp()">
-                <option value="nao">Não</option>
-                <option value="sim">Sim</option>
-            </select>
-        </div>
-
-        <div class="input-group" id="grupoCorte" style="display:none;">
-            <label>Corte?</label>
-            <select id="corte" onchange="calcularImp()">
-                <option value="nao">Não</option>
-                <option value="sim">Sim</option>
-            </select>
-        </div>
-
-        <div class="input-group">
-            <label>Valor unitário (R$)</label>
-            <input type="text" id="valorUnitario" readonly>
-        </div>
-
-        <div class="input-group result-total">
-            <label>Total (R$)</label>
-            <input type="text" id="totalImpressao" readonly>
-        </div>
-
-        <div class="input-group">
-            <label>Largura item (cm)</label>
-            <input type="number" id="larguraItem" value="5" oninput="calcularEncaixe()">
-        </div>
-
-        <div class="input-group">
-            <label>Altura item (cm)</label>
-            <input type="number" id="alturaItem" value="2" oninput="calcularEncaixe()">
-        </div>
-
-        <div class="input-group highlight-blue">
-            <label>Qtd máxima por folha</label>
-            <input type="text" id="qtdMaxima" readonly>
-        </div>
-
-        <div class="preview-wrapper">
-            <h3>Pré-visualização</h3>
-            <div id="previewFolha"></div>
+                <div class="input-group">
+                    <label>Para:</label>
+                    <input type="text" id="valorPara" readonly placeholder="Resultado">
+                    <select id="unidadePara" onchange="converterMedida()">
+                        <option value="mm">mm</option>
+                        <option value="cm">cm</option>
+                        <option value="m" selected>m</option>
+                        <option value="pol">polegadas</option>
+                    </select>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="converter-section">
-        <h3>Conversor de Medidas</h3>
-        <div class="converter-grid">
-            <div class="input-group">
-                <label>De:</label>
-                <input type="number" id="valorDe" placeholder="0" oninput="converterMedida()">
-                <select id="unidadeDe" onchange="converterMedida()">
-                    <option value="mm">mm</option>
-                    <option value="cm" selected>cm</option>
-                    <option value="m">m</option>
-                    <option value="pol">polegadas</option>
-                </select>
+    <div id="tab-produtos" class="tab-content">
+        <div class="products-section">
+            <div class="search-wrapper">
+                <input type="text" id="buscaProduto" class="search-input" placeholder="🔍 Digite para buscar um produto (Ex: Crachá)..." oninput="filtrarProdutos()">
             </div>
 
-            <div class="converter-arrow">
-                <span>➞</span>
-            </div>
-
-            <div class="input-group">
-                <label>Para:</label>
-                <input type="text" id="valorPara" readonly placeholder="Resultado">
-                <select id="unidadePara" onchange="converterMedida()">
-                    <option value="mm">mm</option>
-                    <option value="cm">cm</option>
-                    <option value="m" selected>m</option>
-                    <option value="pol">polegadas</option>
-                </select>
+            <div class="products-table-wrapper">
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th>Produto / Especificação</th>
+                            <th>Preço Unitário</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaProdutosCorpo">
+                        </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+    // ==========================================
+    // DADOS DOS PRODUTOS (ESTRUTURA JSON LOCAL)
+    // ==========================================
+    const listaDeProdutosProntos = [
+        { "nome": "XEROX A4 PB (1-5)", "preco": 0.75 },
+        { "nome": "XEROX A4 PB (21-49)", "preco": 0.25 },
+        { "nome": "XEROX A4 PB (+50)", "preco": 0.20 },
+        { "nome": "XEROX A4 COLORIDO LASER (1-5)", "preco": 2.50 },
+        { "nome": "XEROX A4 COLORIDO JATO (21-49)", "preco": 0.50 },
+        { "nome": "XEROX A4 COLORIDO JATO (1-20)", "preco": 1.20 },
+        { "nome": "XEROX A3 PB (1-20)", "preco": 5.50 },
+        { "nome": "XEROX A3 COLORIDO (1-20)", "preco": 6.00 },
+        { "nome": "XEROX/SCANNER PLOTAGEM A1 PB", "preco": 8.00 },
+        { "nome": "XEROX/SCANNER PLOT A1 COLORIDO", "preco": 9.00 },
+        { "nome": "XEROX/SCANNER PLOTAGEM A2 PB", "preco": 5.00 },
+        { "nome": "XEROX/SCANNER PLOT A2 COLORIDO", "preco": 7.50 },
+        { "nome": "XEROX/SCANNER PLOTAGEM A0 PB", "preco": 10.00 },
+        { "nome": "XEROX/SCANNER PLOT A0 COLORIDO", "preco": 15.00 },
+        { "nome": "COPIA DE CHAVE SIMPLES", "preco": 10.00 },
+        { "nome": "IMPRESSAO PB (1-05)", "preco": 2.50 },
+        { "nome": "IMPRESSAO / XEROX PB (21-49)", "preco": 0.35 },
+        { "nome": "IMPRESSAO / XEROX PB (6-20)", "preco": 1.00 },
+        { "nome": "IMPRESSAO / XEROX PB (+50)", "preco": 0.25 },
+        { "nome": "IMPRESSAO / XEROX PB (+1000)", "preco": 0.20 },
+        { "nome": "IMPRESSAO COLORIDA LASER (1-20)", "preco": 4.00 },
+        { "nome": "IMPRESSAO COLORIDA LASER(21-49)", "preco": 2.20 },
+        { "nome": "IMPRESSAO COLORIDA LASER (+50)", "preco": 1.80 },
+        { "nome": "IMPRESSAO A3 PB SULFITE (1-20)", "preco": 6.00 },
+        { "nome": "IMPRESSAO A3 COLORIDA (1-20)", "preco": 7.00 },
+        { "nome": "PLASTIFICACAO (RG)", "preco": 5.00 },
+        { "nome": "ENCADERNACAO AERO 50 FLS", "preco": 20.00 },
+        { "nome": "PLASTIFICACAO (A4) (1-20)", "preco": 8.00 },
+        { "nome": "PLASTIFICACAO (A3) (1-20)", "preco": 14.00 },
+        { "nome": "PLOTAGEM A2 PB", "preco": 10.00 },
+        { "nome": "PLOTAGEM A2 COLORIDA", "preco": 13.00 },
+        { "nome": "PLOTAGEM A1 PB", "preco": 12.00 },
+        { "nome": "PLOTAGEM A1 COLORIDA", "preco": 14.00 },
+        { "nome": "PLOTAGEM A0 PB", "preco": 14.00 },
+        { "nome": "PLOTAGEM A0 COLORIDA", "preco": 18.00 },
+        { "nome": "IMPRESSAO A4 COUCHE 170G (1-15)", "preco": 6.00 },
+        { "nome": "IMPRESSAO A4 COUCHE 300G (1-15)", "preco": 7.00 },
+        { "nome": "IMPRESSAO A3 COUCHE 300G(1-15)", "preco": 12.00 },
+        { "nome": "IMPRESSAO A3 COUCHE 170G (1-15)", "preco": 10.00 },
+        { "nome": "ENCADERNACAO A3 14-17MM", "preco": 25.00 },
+        { "nome": "ENCADERNACAO A4 50MM", "preco": 35.00 },
+        { "nome": "ENCADERNACAO A4 25-33MM", "preco": 22.00 },
+        { "nome": "ENCADERNACAO A4 14-17MM", "preco": 12.00 },
+        { "nome": "ENCADERNACAO A4 9-12MM", "preco": 10.00 },
+        { "nome": "ENCADERNACAO A4 40MM", "preco": 24.00 },
+        { "nome": "ENCADERNACAO A3 07-12MM", "preco": 16.00 },
+        { "nome": "IMPRESSAO PAPEL ADESIVO A4(1-20)", "preco": 10.00 },
+        { "nome": "IMPRESSAO PAPEL ADESIVO A3(+20)", "preco": 15.00 },
+        { "nome": "ENVELOPE KRAFT A4", "preco": 2.50 },
+        { "nome": "PORTA CNH", "preco": 5.00 },
+        { "nome": "PORTA DOCUMENTO VEICULAR", "preco": 8.00 },
+        { "nome": "PORTA CNH+CARTAO", "preco": 8.00 },
+        { "nome": "ESPIRAL (N 7-12)", "preco": 1.00 },
+        { "nome": "ADESIVO VINIL BRANCO LEITOSO", "preco": 135.00 },
+        { "nome": "ADESIVO VINIL BRANCO FOSCO", "preco": 135.00 },
+        { "nome": "ADESIVO VINIL BLACKOUT", "preco": 135.00 },
+        { "nome": "ADESIVO TRANSPARENTE VINIL SEM CALÇO", "preco": 135.00 },
+        { "nome": "ADESIVO TRANSPARENTE COM CALÇO BRANCO", "preco": 220.00 },
+        { "nome": "ADESIVO BRANCO + TRANSPARENTE", "preco": 170.00 },
+        { "nome": "ADESIVO VINIL BRANCO LEITOSO + MANTA MAGNÉTICA", "preco": 450.00 },
+        { "nome": "ADESIVO VINIL MICROPERFURADO", "preco": 180.00 },
+        { "nome": "ACRÍLICO TRANSPARENTE S/ IMPRESSÃO", "preco": 500.00 },
+        { "nome": "ACRÍLICO TRANSPARENTE C/ IMPRESSÃO", "preco": 850.00 },
+        { "nome": "ACRÍLICO BRANCO S/ IMPRESSÃO", "preco": 550.00 },
+        { "nome": "ACRÍLICO BRANCO C/ IMPRESSÃO", "preco": 750.00 },
+        { "nome": "ACRÍLICO PRETO S/ IMPRESSÃO", "preco": 550.00 },
+        { "nome": "ACRÍLICO PRETO C/ IMPRESSÃO", "preco": 750.00 },
+        { "nome": "ACRÍLICO PRATA/DOURADO/ROSÊ S/ IMPRESSÃO", "preco": 1400.00 },
+        { "nome": "MDF CRU - CORTE", "preco": 200.00 },
+        { "nome": "MDF CRU + BRANCO - CORTE", "preco": 250.00 },
+        { "nome": "MDF CRU + BRANCO - CORTE + IMPRESSÃO", "preco": 450.00 },
+        { "nome": "ACM", "preco": 0.00 },
+        { "nome": "PVC EXPANDIDO", "preco": 0.00 },
+        { "nome": "PVC", "preco": 300.00 },
+        { "nome": "PS", "preco": 320.00 },
+        { "nome": "TROFÉU EM ACRÍLICO", "preco": 0.00 },
+        { "nome": "TROFÉU EM MDF", "preco": 0.00 },
+        { "nome": "MEDALHA EM ACRÍLICO", "preco": 0.00 },
+        { "nome": "MEDALHA EM MDF", "preco": 0.00 },
+        { "nome": "BANNER LONA (METRO)", "preco": 120.00 },
+        { "nome": "ADESIVO DE VENDE-SE", "preco": 30.00 },
+        { "nome": "ESPIRAL (N 17-23)", "preco": 7.00 },
+        { "nome": "PLACA DE PVC (10X15)", "preco": 12.90 },
+        { "nome": "CORDINHA PARA CRACHA", "preco": 4.00 },
+        { "nome": "CANETA BIC", "preco": 2.50 },
+        { "nome": "PACOTE FOLHA A4", "preco": 40.00 },
+        { "nome": "ARTE", "preco": 0.00 },
+        { "nome": "CARIMBO S841", "preco": 49.00 },
+        { "nome": "CARIMBO S842", "preco": 65.00 },
+        { "nome": "CARIMBO S843", "preco": 95.00 },
+        { "nome": "CARIMBO S829", "preco": 125.00 },
+        { "nome": "CARIMBO S825", "preco": 120.00 },
+        { "nome": "CARIMBO R532", "preco": 115.00 },
+        { "nome": "CARIMBO R524", "preco": 115.00 },
+        { "nome": "CRACHA/COMANDA PVC 4X0", "preco": 15.00 },
+        { "nome": "CRACHA/COMANDA PVC 4X0 (+5)", "preco": 10.00 },
+        { "nome": "CRACHA/COMANDA PVC 4X0 (+20)", "preco": 5.00 },
+        { "nome": "CRACHA/COMANDA PVC 4X1", "preco": 17.00 },
+        { "nome": "CRACHA/COMANDA PVC 4X1 (+5)", "preco": 12.00 },
+        { "nome": "CRACHA/COMANDA PVC 4X1 (+20)", "preco": 7.00 },
+        { "nome": "CRACHA/COMANDA PVC 4X4", "preco": 25.00 },
+        { "nome": "CRACHA/COMANDA PVC 4X4 (+5)", "preco": 20.00 },
+        { "nome": "CRACHA/COMANDA PVC 4X4 (+20)", "preco": 17.00 },
+        { "nome": "CARTÃO DE VISITA EXPRESS (100 UNDS) 4X0", "preco": 65.00 },
+        { "nome": "CARTÃO DE VISITA EXPRESS (100 UNDS) 4X1", "preco": 75.00 },
+        { "nome": "CARTÃO DE VISITA EXPRESS (100 UNDS) 4X4", "preco": 90.00 },
+        { "nome": "CARTÃO DE VISITA VERNIZ UV TOTAL FRENTE 4X0 500 UNDS", "preco": 148.25 },
+        { "nome": "CARTÃO DE VISITA VERNIZ UV TOTAL FRENTE 4X0 1000 UNDS", "preco": 165.00 },
+        { "nome": "CARTÃO DE VISITA VERNIZ UV TOTAL FRENTE 4X0 2000 UNDS", "preco": 295.00 },
+        { "nome": "CARTÃO DE VISITA VERNIZ UV TOTAL FRENTE 4X0 3000 UNDS", "preco": 425.00 },
+        { "nome": "CARTÃO DE VISITA VERNIZ UV TOTAL FRENTE 4X0 5000 UNDS", "preco": 675.00 },
+        { "nome": "CARTÃO DE VISITA VERNIZ UV TOTAL FRENTE 4X1 500 UNDS", "preco": 155.00 },
+        { "nome": "CARTÃO DE VISITA VERNIZ UV TOTAL FRENTE 4X1 1000 UNDS", "preco": 165.00 },
+        { "nome": "CARTÃO DE VISITA VERNIZ UV TOTAL FRENTE 4X1 2000 UNDS", "preco": 300.00 },
+        { "nome": "CARTÃO DE VISITA VERNIZ UV TOTAL FRENTE 4X1 3000 UNDS", "preco": 430.00 },
+        { "nome": "CARTÃO DE VISITA VERNIZ UV TOTAL FRENTE 4X1 5000 UNDS", "preco": 690.00 },
+        { "nome": "CARTÃO DE VISITA VERNIZ UV TOTAL FRENTE 4X4 500 UNDS", "preco": 175.00 },
+        { "nome": "CARTÃO DE VISITA VERNIZ UV TOTAL FRENTE 4X4 1000 UNDS", "preco": 185.00 },
+        { "nome": "CARTÃO DE VISITA VERNIZ UV TOTAL FRENTE 4X4 2000 UNDS", "preco": 320.00 },
+        { "nome": "CARTÃO DE VISITA VERNIZ UV TOTAL FRENTE 4X4 3000 UNDS", "preco": 470.00 },
+        { "nome": "CARTÃO DE VISITA VERNIZ UV TOTAL FRENTE 4X4 5000 UNDS", "preco": 755.00 },
+        { "nome": "CARTÃO DE VISITA VERNIZ UV TOTAL FRENTE E VERSO 4X4 1000 UNDS", "preco": 190.00 },
+        { "nome": "CARTÃO DE VISITA VERNIZ UV TOTAL FRENTE E VERSO 4X4 2000 UNDS", "preco": 360.00 },
+        { "nome": "CARTÃO DE VISITA VERNIZ UV TOTAL FRENTE E VERSO 4X4 3000 UNDS", "preco": 500.00 },
+        { "nome": "CARTÃO DE VISITA VERNIZ UV TOTAL FRENTE E VERSO 4X4 5000 UNDS", "preco": 775.00 },
+        { "nome": "CARTÃO DE VISITA LAM. FOSCA E VERNIZ LOCALIZADO FRENTE 4X0 500 UNDS", "preco": 180.00 },
+        { "nome": "CARTÃO DE VISITA LAM. FOSCA E VERNIZ LOCALIZADO FRENTE 4X0 1000 UNDS", "preco": 190.00 },
+        { "nome": "CARTÃO DE VISITA LAM. FOSCA E VERNIZ LOCALIZADO FRENTE 4X1 500 UNDS", "preco": 190.00 },
+        { "nome": "CARTÃO DE VISITA LAM. FOSCA E VERNIZ LOCALIZADO FRENTE 4X1 1000 UNDS", "preco": 200.00 },
+        { "nome": "CARTÃO DE VISITA LAM. FOSCA E VERNIZ LOCALIZADO FRENTE 4X4 500 UNDS", "preco": 200.00 },
+        { "nome": "CARTÃO DE VISITA LAM. FOSCA E VERNIZ LOCALIZADO FRENTE 4X4 1000 UNDS", "preco": 220.00 },
+        { "nome": "CARTÃO DE VISITA LAM. FOSCA E VERNIZ LOCALIZADO FRENTE E VERSO 4X4 100 UNDS", "preco": 210.00 },
+        { "nome": "CARTÃO DE VISITA LAM. FOSCA E VERNIZ LOCALIZADO FRENTE E VERSO 4X4 250 UNDS", "preco": 215.00 },
+        { "nome": "CARTÃO DE VISITA LAM. FOSCA E VERNIZ LOCALIZADO FRENTE E VERSO 4X4 500 UNDS", "preco": 220.00 },
+        { "nome": "CARTÃO DE VISITA LAM. FOSCA E VERNIZ LOCALIZADO FRENTE E VERSO 4X4 1000 UNDS", "preco": 270.00 },
+        { "nome": "CARTÃO DE VISITA LAM. FOSCA E VERNIZ LOCALIZADO FRENTE E VERSO 4X4 3000 UNDS", "preco": 710.00 },
+        { "nome": "CARTÃO DE VISITA ESPECIAL", "preco": 0.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 45X51MM 4X0 1000 UNDS", "preco": 165.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 45X51MM 4X0 2000 UNDS", "preco": 230.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 45X51MM 4X1 1000 UNDS", "preco": 170.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 45X51MM 4X1 2000 UNDS", "preco": 245.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 45X51MM 4X4 1000 UNDS", "preco": 175.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 45X51MM 4X4 2000 UNDS", "preco": 250.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X25MM 4X0 1000 UNDS", "preco": 160.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X25MM 4X0 2000 UNDS", "preco": 225.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X25MM 4X1 1000 UNDS", "preco": 165.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X25MM 4X1 2000 UNDS", "preco": 235.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X25MM 4X4 1000 UNDS", "preco": 170.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X25MM 4X4 2000 UNDS", "preco": 250.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X51MM 4X0 500 UNDS", "preco": 150.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X51MM 4X0 1000 UNDS", "preco": 190.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X51MM 4X0 2000 UNDS", "preco": 390.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X51MM 4X0 3000 UNDS", "preco": 575.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X51MM 4X0 5000 UNDS", "preco": 850.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X51MM 4X1 500 UNDS", "preco": 155.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X51MM 4X1 1000 UNDS", "preco": 195.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X51MM 4X1 2000 UNDS", "preco": 405.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X51MM 4X1 3000 UNDS", "preco": 585.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X51MM 4X1 5000 UNDS", "preco": 860.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X51MM 4X4 500 UNDS", "preco": 160.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X51MM 4X4 1000 UNDS", "preco": 210.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X51MM 4X4 2000 UNDS", "preco": 420.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X51MM 4X4 3000 UNDS", "preco": 605.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X51MM 4X4 5000 UNDS", "preco": 950.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X102MM 4X0 500 UNDS", "preco": 255.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X102MM 4X0 1000 UNDS", "preco": 380.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X102MM 4X0 2000 UNDS", "preco": 690.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X102MM 4X0 3000 UNDS", "preco": 995.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X102MM 4X0 5000 UNDS", "preco": 1570.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X102MM 4X1 500 UNDS", "preco": 280.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X102MM 4X1 1000 UNDS", "preco": 405.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X102MM 4X1 2000 UNDS", "preco": 725.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X102MM 4X1 3000 UNDS", "preco": 1055.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X102MM 4X1 5000 UNDS", "preco": 1660.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X102MM 4X4 500 UNDS", "preco": 285.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X102MM 4X4 1000 UNDS", "preco": 410.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X102MM 4X4 2000 UNDS", "preco": 750.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X102MM 4X4 3000 UNDS", "preco": 1075.00 },
+        { "nome": "TAG PADRÃO FURO UV TOTAL FRENTE 91X102MM 4X4 5000 UNDS", "preco": 1705.00 },
+        { "nome": "TAG PADRÃO FURO LAM FOSCA FRENTE E VERNIZ LOCALIZADO 45X51MM 4X0 1000 UNDS", "preco": 160.00 },
+        { "nome": "TAG PADRÃO FURO LAM FOSCA FRENTE E VERNIZ LOCALIZADO 45X51MM 4X1 1000 UNDS", "preco": 170.00 },
+        { "nome": "TAG PADRÃO FURO LAM FOSCA FRENTE E VERNIZ LOCALIZADO 45X51MM 4X4 1000 UNDS", "preco": 175.00 },
+        { "nome": "TAG PADRÃO FURO LAM FOSCA FRENTE E VERNIZ LOCALIZADO 91X25MM 4X0 1000 UNDS", "preco": 165.00 },
+        { "nome": "TAG PADRÃO FURO LAM FOSCA FRENTE E VERNIZ LOCALIZADO 91X25MM 4X1 1000 UNDS", "preco": 175.00 },
+        { "nome": "TAG PADRÃO FURO LAM FOSCA FRENTE E VERNIZ LOCALIZADO 91X25MM 4X4 1000 UNDS", "preco": 180.00 },
+        { "nome": "TAG PADRÃO FURO LAM FOSCA FRENTE E VERNIZ LOCALIZADO 91X51MM 4X0 1000 UNDS", "preco": 235.00 },
+        { "nome": "TAG PADRÃO FURO LAM FOSCA FRENTE E VERNIZ LOCALIZADO 91X51MM 4X1 1000 UNDS", "preco": 240.00 },
+        { "nome": "TAG PADRÃO FURO LAM FOSCA FRENTE E VERNIZ LOCALIZADO 91X51MM 4X4 1000 UNDS", "preco": 245.00 },
+        { "nome": "TAG PADRÃO FURO LAM FOSCA FRENTE E VERNIZ LOCALIZADO 91X102MM 4X0 1000 UNDS", "preco": 435.00 },
+        { "nome": "TAG PADRÃO FURO LAM FOSCA FRENTE E VERNIZ LOCALIZADO 91X102MM 4X1 1000 UNDS", "preco": 460.00 },
+        { "nome": "TAG PADRÃO FURO LAM FOSCA FRENTE E VERNIZ LOCALIZADO 91X102MM 4X4 1000 UNDS", "preco": 475.00 },
+        { "nome": "TAG PADRÃO FURO LAM FOSCA FRENTE E VERNIZ LOCALIZADO FRENTE E VERSO 45X51MM 4X4 1000 UNDS", "preco": 190.00 },
+        { "nome": "TAG PADRÃO FURO LAM FOSCA FRENTE E VERNIZ LOCALIZADO FRENTE E VERSO 45X51MM 4X4 2000 UNDS", "preco": 305.00 },
+        { "nome": "TAG PADRÃO FURO LAM FOSCA FRENTE E VERNIZ LOCALIZADO FRENTE E VERSO 91X25MM 4X4 1000 UNDS", "preco": 205.00 },
+        { "nome": "TAG PADRÃO FURO LAM FOSCA FRENTE E VERNIZ LOCALIZADO FRENTE E VERSO 91X25MM 4X4 2000 UNDS", "preco": 310.00 },
+        { "nome": "TAG PADRÃO FURO LAM FOSCA FRENTE E VERNIZ LOCALIZADO FRENTE E VERSO 91X51MM 4X4 1000 UNDS", "preco": 245.00 },
+        { "nome": "TAG PADRÃO FURO LAM FOSCA FRENTE E VERNIZ LOCALIZADO FRENTE E VERSO 91X51MM 4X4 2000 UNDS", "preco": 305.00 },
+        { "nome": "TAG PADRÃO FURO LAM FOSCA FRENTE E VERNIZ LOCALIZADO FRENTE E VERSO 91X102MM 4X4 1000 UNDS", "preco": 360.00 },
+        { "nome": "TAG PADRÃO FURO LAM FOSCA FRENTE E VERNIZ LOCALIZADO FRENTE E VERSO 91X102MM 4X4 2000 UNDS", "preco": 525.00 },
+        { "nome": "TAG ESPECIAL", "preco": 0.00 },
+        { "nome": "TOPO DE BOLO", "preco": 30.00 },
+        { "nome": "CALENDÁRIO", "preco": 0.00 },
+        { "nome": "ADESIVO DTF", "preco": 0.00 },
+        { "nome": "PANFLETO ESPECIAL", "preco": 0.00 },
+        { "nome": "BLOCOS", "preco": 0.00 },
+        { "nome": "BLOCOS AUTOCOPIATIVOS", "preco": 0.00 },
+        { "nome": "CANETA PERSONALIZADA", "preco": 7.00 },
+        { "nome": "SCANNER", "preco": 7.00 },
+        { "nome": "IMPRESSAO GUIA PAGAMENTO", "preco": 7.00 },
+        { "nome": "PLOTAGEM A3 PB", "preco": 3.00 },
+        { "nome": "PLOTAGEM A3 COLORIDO", "preco": 4.50 },
+        { "nome": "CORTE", "preco": 5.00 },
+        { "nome": "LAMINACAO A4", "preco": 3.00 },
+        { "nome": "LAMINACAO A3", "preco": 5.00 },
+        { "nome": "FURO", "preco": 1.00 },
+        { "nome": "SCANNER (1-10)", "preco": 2.00 },
+        { "nome": "SCANNER (11-100)", "preco": 1.50 },
+        { "nome": "PASTA GRAMPO", "preco": 3.50 },
+        { "nome": "PASTA CANALETA", "preco": 3.30 },
+        { "nome": "CARTAO DE VACINA PB", "preco": 20.00 },
+        { "nome": "FOLHA A4", "preco": 0.50 },
+        { "nome": "CANETA FABER CASTELL", "preco": 1.90 },
+        { "nome": "CANETA CIS", "preco": 1.00 },
+        { "nome": "CARTAO DE VACINA COLORIDO", "preco": 40.00 },
+        { "nome": "ENVELOPE PEQUENO", "preco": 0.20 },
+        { "nome": "ENCADERNACAO A4 20-23MM", "preco": 16.00 },
+        { "nome": "ENVELOPE BRANCO", "preco": 1.00 },
+        { "nome": "CAMISA PERSONALIZADA", "preco": 45.90 },
+        { "nome": "SUBLIMACAO", "preco": 18.00 },
+        { "nome": "IMPRESSAO A3 PB SULFITE (+20)", "preco": 5.00 },
+        { "nome": "IMPRESSAO A3 COLORIDA (+20)", "preco": 5.00 },
+        { "nome": "IMPRESSAO A4 COUCHE 170G (+15)", "preco": 4.50 },
+        { "nome": "IMPRESSAO A3 COUCHE 170G (+15)", "preco": 9.00 },
+        { "nome": "IMPRESSAO A4 COUCHE 300G (+15)", "preco": 6.00 },
+        { "nome": "IMPRESSAO A3 COUCHE 300G (+15)", "preco": 9.00 },
+        { "nome": "IMPRESSAO PAPEL ADESIVO A4(+20)", "preco": 9.00 },
+        { "nome": "IMPRESSAO PAPEL ADESIVO A3(1-20)", "preco": 18.00 },
+        { "nome": "CORTE ESPECIAL A3", "preco": 10.00 },
+        { "nome": "XEROX A3 PB (+20)", "preco": 4.00 },
+        { "nome": "XEROX A3 COLORIDO (+20)", "preco": 4.50 },
+        { "nome": "SCANNER (+100)", "preco": 0.50 },
+        { "nome": "SCANNER A0 A1 A2", "preco": 5.00 },
+        { "nome": "PLASTIFICACAO (A5)", "preco": 7.00 },
+        { "nome": "PLASTIFICACAO (A4)(+20)", "preco": 6.00 },
+        { "nome": "PLASTIFICACAO (A4)(FICHA)", "preco": 15.00 },
+        { "nome": "PLASTIFICACAO (A3)(+20)", "preco": 12.50 },
+        { "nome": "ENCADERNACAO A3 20-23MM", "preco": 35.00 },
+        { "nome": "ENCADERNACAO A3 25-33MM", "preco": 40.00 },
+        { "nome": "ENCADERNACAO A3 40MM", "preco": 45.00 },
+        { "nome": "ENCADERNACAO A3 50MM", "preco": 70.00 },
+        { "nome": "ENCADERNACAO AERO 20 FLS", "preco": 15.00 },
+        { "nome": "ENCADERNACAO AERO 60 FLS", "preco": 11.00 },
+        { "nome": "ENCADERNACAO AERO 100 FLS", "preco": 30.00 },
+        { "nome": "ENCADERNACAO AERO 140 FLS", "preco": 35.00 },
+        { "nome": "ENCADERNACAO AERO 200 FLS", "preco": 40.00 },
+        { "nome": "ENCADERNACAO AERO 250 FLS", "preco": 45.00 },
+        { "nome": "ENCADERNACAO AERO 270 FLS", "preco": 50.00 },
+        { "nome": "WIND BANNER SEM ESTRUTURA", "preco": 250.00 },
+        { "nome": "WIND BANNER COM ESTRUTURA", "preco": 380.00 },
+        { "nome": "IMPRESSAO PAPEL FOTOGRAFICO", "preco": 10.00 },
+        { "nome": "QUEBRA CABECA", "preco": 1.00 },
+        { "nome": "PULSEIRA DE IDENTIFICACAO C/ FOLHA", "preco": 25.00 },
+        { "nome": "BOTTON 3X3", "preco": 4.80 },
+        { "nome": "BOTTON 4X4", "preco": 6.60 },
+        { "nome": "MOUSE PAD", "preco": 1.00 },
+        { "nome": "PLACA DECORATIVA", "preco": 1.00 },
+        { "nome": "SCANNER PLOTAGEM", "preco": 10.00 },
+        { "nome": "1 ANO APOSTILA TORQUATO", "preco": 19.20 },
+        { "nome": "2 ANO APOSTILA TORQUATO", "preco": 36.80 },
+        { "nome": "3 ANO APOSTILA TORQUATO", "preco": 27.60 },
+        { "nome": "4 ANO APOSTILA PROF. VALQUIRIA", "preco": 43.20 },
+        { "nome": "5 ANO APOSTILA TORQUATO", "preco": 20.40 },
+        { "nome": "AGENDA PRONTA ENTREGA", "preco": 49.90 },
+        { "nome": "ILHOS", "preco": 3.00 },
+        { "nome": "CANVA M²", "preco": 250.00 },
+        { "nome": "ACABAMENTO BANNER", "preco": 10.00 },
+        { "nome": "AGENDA PERSONALIZADA", "preco": 69.90 },
+        { "nome": "BORRACHA PARA CARIMBO", "preco": 30.00 },
+        { "nome": "IMPRESSAO METRO(LINEAR) AP FOSCO", "preco": 1.00 },
+        { "nome": "IMPRESSAO MT(LINEAR) FOTOGLOSSY", "preco": 1.00 },
+        { "nome": "PLACA PIX EM ACRILICO", "preco": 65.00 },
+        { "nome": "PLACA PIX EM PVC", "preco": 45.00 },
+        { "nome": "CANECA PERSONALIZ. POLIPROPILENO", "preco": 29.90 },
+        { "nome": "CORTE MATERIAL DO CLIENTE M²", "preco": 1.00 },
+        { "nome": "APOSTILA K 10 IDIOMAS", "preco": 34.00 },
+        { "nome": "KIT ADESIVOS PASCOA", "preco": 40.00 },
+        { "nome": "ACETATO", "preco": 2.00 },
+        { "nome": "ENVELOPE BRANCO 110X170MM 90GR", "preco": 0.50 },
+        { "nome": "ENVELOPE BRANCO 114X229MM 90GR", "preco": 2.00 },
+        { "nome": "4° ANO APOSTILA PROF. ANA LUCIA", "preco": 41.40 },
+        { "nome": "4° ANO APOSTILA PROF. JAQUELINE", "preco": 41.40 },
+        { "nome": "IMPRESSAO A3 AP120G (+15)", "preco": 8.00 },
+        { "nome": "IMPRESSAO A3 AP120G (1-15)", "preco": 9.00 },
+        { "nome": "IMPRESSAO A4 AP120G (+15)", "preco": 6.00 },
+        { "nome": "IMPRESSAO A4 AP120G (1-15)", "preco": 7.00 },
+        { "nome": "IMPRESSAO A3 AP240G (+15)", "preco": 9.00 },
+        { "nome": "IMPRESSAO A3 AP240G (1-15)", "preco": 12.00 },
+        { "nome": "IMPRESSAO A4 AP240G (+15)", "preco": 7.00 },
+        { "nome": "IMPRESSAO A4 AP240G (1-15)", "preco": 8.00 },
+        { "nome": "KIT VOLTA AS AULAS INICIAL", "preco": 50.00 },
+        { "nome": "KIT VOLTA AS AULAS ESSENCIAL", "preco": 60.00 },
+        { "nome": "KIT VOLTA AS AULAS AVANCADO", "preco": 65.00 },
+        { "nome": "KIT VOLTA AS AULAS COMPLETO", "preco": 130.00 },
+        { "nome": "KIT VOLTA AS AULAS PREMIUM", "preco": 180.00 },
+        { "nome": "IMPRESSÃO A4 SULFITE JATO DE TINTA - (1-5)", "preco": 2.50 },
+        { "nome": "IMPRESSÃO A4 SULFITE JATO DE TINTA - (6-49)", "preco": 1.20 },
+        { "nome": "IMPRESSÃO A4 SULFITE JATO DE TINTA - (+50)", "preco": 0.35 }
+    ];
+
+    // LÓGICA DAS ABAS
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+        if (event && event.currentTarget) {
+            event.currentTarget.classList.add('active');
+        }
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+    }
+
+    // CARREGAMENTO DOS PRODUTOS NA TABELA
+    function carregarProdutos() {
+        const tabela = document.getElementById('listaProdutosCorpo');
+        if (!tabela) return;
+        tabela.innerHTML = "";
+
+        listaDeProdutosProntos.forEach(produto => {
+            const tr = document.createElement('tr');
+            
+            const tdNome = document.createElement('td');
+            tdNome.classList.add('product-name-cell');
+            tdNome.innerText = produto.nome;
+
+            const tdPreco = document.createElement('td');
+            tdPreco.classList.add('product-price-cell');
+            tdPreco.innerText = produto.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            tr.appendChild(tdNome);
+            tr.appendChild(tdPreco);
+            tabela.appendChild(tr);
+        });
+    }
+
+    function filtrarProdutos() {
+        // Função interna para remover acentos e deixar o texto limpo
+        const removerAcentos = (texto) => {
+            return texto
+                .normalize("NFD")                  // Separa a letra do acento (Ex: "á" vira "a" + "´")
+                .replace(/[\u0300-\u036f]/g, ""); // Remove os acentos modificadores soltos
+        };
+
+        // Pega o termo digitado, limpa espaços, remove acentos e divide em palavras
+        const termoBusca = removerAcentos(document.getElementById('buscaProduto').value.toLowerCase().trim());
+        const palavrasBusca = termoBusca.split(/\s+/);
+
+        const tabela = document.getElementById('listaProdutosCorpo');
+        const linhas = tabela.getElementsByTagName('tr');
+        let encontrou = false;
+
+        // Remove a linha de "sem resultados" se ela já existir
+        const linhaAviso = document.getElementById('sem-resultados-row');
+        if (linhaAviso) linhaAviso.remove();
+
+        for (let i = 0; i < linhas.length; i++) {
+            // Ignora a linha caso ela não tenha células válidas
+            if (!linhas[i].getElementsByTagName('td')[0]) continue;
+
+            // Pega o nome do produto e também remove os acentos dele para comparar de igual para igual
+            const textoNomeOriginal = linhas[i].getElementsByTagName('td')[0].textContent.toLowerCase();
+            const textoNomeSemAcento = removerAcentos(textoNomeOriginal);
+            
+            // Verifica se cada uma das palavras digitadas (sem acento) bate com o nome (sem acento)
+            const atendeTodosOsTermos = palavrasBusca.every(palavra => textoNomeSemAcento.includes(palavra));
+
+            if (atendeTodosOsTermos) {
+                linhas[i].style.display = "";
+                encontrou = true;
+            } else {
+                linhas[i].style.display = "none";
+            }
+        }
+
+        // Se varreu tudo e não achou nada, mostra a mensagem amigável
+        if (!encontrou) {
+            const tr = document.createElement('tr');
+            tr.id = 'sem-resultados-row';
+            const td = document.createElement('td');
+            td.colSpan = 2;
+            td.classList.add('no-results');
+            td.innerText = "Nenhum produto encontrado com esse termo.";
+            tr.appendChild(td);
+            tabela.appendChild(tr);
+        }
+    }
+
+    // LÓGICA DA CALCULADORA
     const materiaisData = {
         adesivo: [
             { nome: "Vinil Branco/Blackout/Transp.", preco: 135 },
@@ -297,15 +726,13 @@
             alturaPapel = 42;
         }
 
-        // testa normal
         const colunas1 = Math.floor(larguraPapel / larguraItem);
-        const linhas1 = Math.floor(alturaPapel / alturaItem);
-        const total1 = colunas1 * linhas1;
+        const lines1 = Math.floor(alturaPapel / alturaItem);
+        const total1 = colunas1 * lines1;
 
-        // testa rotacionado
         const colunas2 = Math.floor(larguraPapel / alturaItem);
-        const linhas2 = Math.floor(alturaPapel / larguraItem);
-        const total2 = colunas2 * linhas2;
+        const lines2 = Math.floor(alturaPapel / larguraItem);
+        const total2 = colunas2 * lines2;
 
         let melhor = {};
         
@@ -314,7 +741,7 @@
                 largura: larguraItem,
                 altura: alturaItem,
                 colunas: colunas1,
-                linhas: linhas1,
+                linhas: lines1,
                 total: total1
             };
         } else {
@@ -322,13 +749,12 @@
                 largura: alturaItem,
                 altura: larguraItem,
                 colunas: colunas2,
-                linhas: linhas2,
+                linhas: lines2,
                 total: total2
             };
         }
 
         document.getElementById('qtdMaxima').value = melhor.total;
-
         desenharPreview(melhor, larguraPapel, alturaPapel);
     }
 
@@ -364,28 +790,25 @@
         const tipoImp = document.getElementById('tipoImpressão');
 
         titulo.innerText = "ORÇAMENTO DE " + tipo.toUpperCase().replace('_', ' ');
-
         selectMaterial.innerHTML = "";
 
-    if (tipo === "impressão") {
-        camposNormais.style.display = "none";
-        gridImp.style.display = "grid";
-        tipoImp.style.display = "block";
+        if (tipo === "impressão") {
+            camposNormais.style.display = "none";
+            gridImp.style.display = "grid";
+            tipoImp.style.display = "block";
 
-        const tipoFolha = document.getElementById('tipoFolha').value;
+            const tipoFolha = document.getElementById('tipoFolha').value;
+            selectMaterialImp.innerHTML = "";
 
-        selectMaterialImp.innerHTML = "";
+            materiaisImp[tipoFolha].forEach(item => {
+                let option = document.createElement('option');
+                option.value = item.nome;
+                option.text = item.nome;
+                selectMaterialImp.appendChild(option);
+            });
 
-        materiaisImp[tipoFolha].forEach(item => {
-            let option = document.createElement('option');
-            option.value = item.nome;
-            option.text = item.nome;
-            selectMaterialImp.appendChild(option);
-        });
-
-        calcularImp();
-        calcularEncaixe();
-
+            calcularImp();
+            calcularEncaixe();
         } else {
             camposNormais.style.display = "contents";
             gridImp.style.display = "none";
@@ -411,7 +834,6 @@
 
         let valorUnit = 0;
 
-        // SULFITE A4
         if (tipoFolha === "sulfiteA4") {
             if (material === "Preto e Branco") {
                 if (folhas === 1) valorUnit = 2.50;
@@ -420,113 +842,54 @@
                 else if (folhas <= 999) valorUnit = 0.25;
                 else valorUnit = 0.20;
             }
-
             if (material === "Colorido | Jato ") {
                 if (folhas === 1) valorUnit = 2.50;
                 else if (folhas <= 49) valorUnit = 1.20;
                 else if (folhas <= 999) valorUnit = 0.35;
                 else valorUnit = 0.30;
             }
-
             if (material === "Colorido | Laser") {
                 if (folhas === 1) valorUnit = 4.00;
                 else if (folhas <= 49) valorUnit = 2.20;
                 else valorUnit = 1.80;
             }
         }
-
-        // Sulfite A3
         else if (tipoFolha === "sulfiteA3") {
             if (material === "Impressão A3 Preto e Branco") {
                 if (folhas <= 20) valorUnit = 6.00;
                 else valorUnit = 5.00;
             }
-
             if (material === "Impressão A3 Colorida") {
                 if (folhas <= 20) valorUnit = 7.00;
                 else valorUnit = 5.00;
             }
         }
+        else if (tipoFolha === "couche170gA4") { valorUnit = folhas <= 15 ? 6.00 : 4.50; }
+        else if (tipoFolha === "couche170A3") { valorUnit = folhas <= 15 ? 10.00 : 9.00; }
+        else if (tipoFolha === "couche300A4") { valorUnit = folhas <= 15 ? 7.00 : 6.00; }
+        else if (tipoFolha === "couche300A3") { valorUnit = folhas <= 15 ? 12.00 : 9.00; }
+        else if (tipoFolha === "ap240gA4") { valorUnit = folhas <= 15 ? 8.00 : 7.00; }
+        else if (tipoFolha === "ap240gA3") { valorUnit = folhas <= 15 ? 12.00 : 9.00; }
+        else if (tipoFolha === "adesivopapelA4") { valorUnit = folhas <= 20 ? 10.00 : 9.00; }
+        else if (tipoFolha === "adesivopapelA3") { valorUnit = folhas <= 15 ? 18.00 : 15.00; }
 
-        // COUCHÊ 170
-        else if (tipoFolha === "couche170gA4") {
-            valorUnit = folhas <= 15 ? 6.00 : 4.50;
-        }
-        else if (tipoFolha === "couche170A3") {
-            valorUnit = folhas <= 15 ? 10.00 : 9.00;
-        }
-
-        // COUCHÊ 300
-        else if (tipoFolha === "couche300A4") {
-            valorUnit = folhas <= 15 ? 7.00 : 6.00;
-        }
-        else if (tipoFolha === "couche300A3") {
-            valorUnit = folhas <= 15 ? 12.00 : 9.00;
-        }
-
-        // AP 240
-        else if (tipoFolha === "ap240gA4") {
-            valorUnit = folhas <= 15 ? 8.00 : 7.00;
-        }
-        else if (tipoFolha === "ap240gA3") {
-            valorUnit = folhas <= 15 ? 12.00 : 9.00;
+        let adicionalVerso = 0;
+        if (frenteVerso === "sim") {
+            if (material === "Preto e Branco") { adicionalVerso = 0.20; }
+            else if (material === "Colorido | Jato ") { adicionalVerso = 0.35; }
+            else { adicionalVerso = 1.80; }
         }
 
-        // ADESIVO 
-        else if (tipoFolha === "adesivopapelA4") {
-            valorUnit = folhas <= 20 ? 10.00 : 9.00;
-        }
-        else if (tipoFolha === "adesivopapelA3") {
-            valorUnit = folhas <= 15 ? 18.00 : 15.00;
+        valorUnit = valorUnit + adicionalVerso;
+
+        if (corte === "sim" && (tipoFolha === "couche300A3" || tipoFolha === "ap240gA3" || tipoFolha === "adesivopapelA3")) {
+            valorUnit += 5;
         }
 
-    let adicionalVerso = 0;
-
-    if (frenteVerso === "sim") {
-        // Preto e branco
-        if (material === "Preto e Branco") {
-            adicionalVerso = 0.20;
-        }
-
-        // Jato colorido
-        else if (material === "Colorido | Jato ") {
-            adicionalVerso = 0.35;
-        }
-
-        // Laser, Couchê e AP
-        else {
-            adicionalVerso = 1.80;
-        }
+        document.getElementById('valorUnitario').value = valorUnit.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        const total = folhas * (valorUnit);
+        document.getElementById('totalImpressao').value = total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
-
-    valorUnit = valorUnit + adicionalVerso;
-
-    // Adicional de corte
-    if (
-        corte === "sim" &&
-        (
-            tipoFolha === "couche300A3" ||
-            tipoFolha === "ap240gA3" ||
-            tipoFolha === "adesivopapelA3"
-        )
-    ) {
-        valorUnit += 5;
-    }
-
-    document.getElementById('valorUnitario').value =
-    valorUnit.toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-    });
-
-    const total = folhas * (valorUnit);
-
-    document.getElementById('totalImpressao').value =
-        total.toLocaleString('pt-BR', {
-            style: 'currency',
-            currency: 'BRL'
-    });
-}
 
     function calcular() {
         const tipo = document.getElementById('tipoProduto').value;
@@ -539,7 +902,6 @@
         
         if (aplicacaoChecked) { precoM2 += 35; }
 
-        // AJUSTE: Se for PVC, a margem é 0. Caso contrário, 0.4.
         const margemArte = (tipo === 'pvc') ? 0 : 0.4; 
 
         const porLinha = Math.floor(qtd / linhas);
@@ -567,31 +929,20 @@
         const unidadePara = document.getElementById('unidadePara').value;
         const inputResultado = document.getElementById('valorPara');
 
-        if (isNaN(valorDe)) {
-            inputResultado.value = "";
-            return;
-        }
+        if (isNaN(valorDe)) { inputResultado.value = ""; return; }
 
-        // Fatores de conversão para Milímetros (base)
-        const paraMilimetro = {
-            mm: 1,
-            cm: 10,
-            m: 1000,
-            pol: 25.4
-        };
-
-        // Converte de Origem -> Milímetros
+        const paraMilimetro = { mm: 1, cm: 10, m: 1000, pol: 25.4 };
         const valorEmMm = valorDe * paraMilimetro[unidadeDe];
-
-        // Converte de Milímetros -> Destino
         const resultado = valorEmMm / paraMilimetro[unidadePara];
-
-        // Formatação: se for polegada, mostra mais casas decimais
         const casas = unidadePara === 'pol' ? 4 : 2;
         inputResultado.value = resultado.toLocaleString('pt-BR', { maximumFractionDigits: casas });
     }
 
-    window.onload = atualizarMateriais;
+    // Inicializa tudo ao carregar a página
+    window.addEventListener('DOMContentLoaded', () => {
+        atualizarMateriais();
+        carregarProdutos();
+    });
 </script>
 </body>
 </html>
