@@ -40,7 +40,7 @@
                 </select>
             </div>
 
-            <div class="input-group" id="tipoImpressão" style="display: none;">
+            <div class="input-group" id="tipoImpressão">
                 <label>Tipo Folha</label>
                 <select id="tipoFolha" onchange="atualizarMateriais(); calcularImp();">
                     <option value="sulfiteA4">Sulfite A4</option>
@@ -124,17 +124,17 @@
         <div class="calculator-grid" id="gridImpressao" style="display: none;">
             <div class="input-group">
                 <label>Tipo de Impressão</label>
-                <select id="materialImp" onchange="calcularImp()"></select>
+                <select id="materialImp" onchange="calcularImp() || calcularEncaixe()"></select>
             </div>
 
             <div class="input-group">
                 <label>Quantidade de folhas</label>
-                <input type="number" id="qtdFolhas" value="1" oninput="calcularImp()">
+                <input type="number" id="qtdImp" value="1" oninput="calcularImp()">
             </div>
 
-            <div class="input-group">
+            <div class="input-group" id="grupoFrenteVerso">
                 <label>Frente e verso?</label>
-                <select id="frenteVerso" onchange="calcularImp()">
+                <select id="frenteVerso" onchange="calcularImp()" >
                     <option value="nao">Não</option>
                     <option value="sim">Sim</option>
                 </select>
@@ -722,7 +722,9 @@
 
     function calcularEncaixe() {
         const tipoFolha = document.getElementById('tipoFolha').value;
+        const frenteVerso = document.getElementById('grupoFrenteVerso');
         const grupoCorte = document.getElementById('grupoCorte');
+        const material = document.getElementById('materialImp').value;
         const larguraItem = parseFloat(document.getElementById('larguraItem').value) || 0;
         const alturaItem = parseFloat(document.getElementById('alturaItem').value) || 0;
 
@@ -845,7 +847,7 @@
     }
 
     function calcularImp() {
-        const folhas = parseInt(document.getElementById('qtdFolhas').value) || 0;
+        const folhas = parseInt(document.getElementById('qtdImp').value) || 0;
         const frenteVerso = document.getElementById('frenteVerso').value;
         const tipoFolha = document.getElementById('tipoFolha').value;
         const material = document.getElementById('materialImp').value;
@@ -894,9 +896,12 @@
 
         let adicionalVerso = 0;
         if (frenteVerso === "sim") {
-            if (material === "Preto e Branco") { adicionalVerso = 0.20; }
-            else if (material === "Colorido | Jato ") { adicionalVerso = 0.35; }
-            else { adicionalVerso = 1.80; }
+            if (material === "Colorido | Laser " || tipoFolha === "couche170gA4" || tipoFolha === "couche170A3" || tipoFolha === "couche300A4" || tipoFolha === "couche300A3" || tipoFolha === "ap240gA4" || tipoFolha === "ap240gA3"){
+                if (folhas === 1) adicionalVerso = 4;
+                else if (folhas <= 49) adicionalVerso = 2.20;
+                else adicionalVerso = 1.80;
+            }
+            else { adicionalVerso = valorUnit; }
         }
 
         valorUnit = valorUnit + adicionalVerso;
