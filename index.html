@@ -160,12 +160,12 @@
 
             <div class="input-group">
                 <label>Largura item (cm)</label>
-                <input type="number" id="larguraItem" value="5" oninput="calcularEncaixe()">
+                <input type="number" id="larguraItem" value="5" min="0.1" oninput="calcularEncaixe()">
             </div>
 
             <div class="input-group">
                 <label>Altura item (cm)</label>
-                <input type="number" id="alturaItem" value="2" oninput="calcularEncaixe()">
+                <input type="number" id="alturaItem" value="2" min="0.1" oninput="calcularEncaixe()">
             </div>
 
             <div class="input-group highlight-blue">
@@ -725,8 +725,15 @@
         const frenteVerso = document.getElementById('grupoFrenteVerso');
         const grupoCorte = document.getElementById('grupoCorte');
         const material = document.getElementById('materialImp').value;
-        const larguraItem = parseFloat(document.getElementById('larguraItem').value) || 0;
-        const alturaItem = parseFloat(document.getElementById('alturaItem').value) || 0;
+
+        const larguraItem = parseFloat(document.getElementById('larguraItem').value);
+        const alturaItem = parseFloat(document.getElementById('alturaItem').value);
+
+        if (!larguraItem || !alturaItem || larguraItem <= 0 || alturaItem <= 0) {
+            document.getElementById('qtdMaxima').value = "";
+            document.getElementById('previewFolha').innerHTML = "";
+            return;
+        }
 
         let larguraPapel = 21;
         let alturaPapel = 29.7;
